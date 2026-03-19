@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 // Route imports
 import authRoutes from './modules/auth/auth.routes'
 import productsRoutes from './modules/products/product.routes'
+import movementsRoutes from './modules/movements/movement.routes'
 
 dotenv.config()
 
@@ -16,6 +17,7 @@ app.use(express.json())
 // Routes config
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productsRoutes)
+app.use('/api/movements', movementsRoutes)
 
 app.get('/', (_req, res) => {
 	res.send('API running 🚀')
