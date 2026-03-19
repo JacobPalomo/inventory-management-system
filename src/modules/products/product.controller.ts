@@ -18,9 +18,13 @@ export const createProduct = async (req: Request, res: Response) => {
 	}
 }
 
-export const getProducts = async (_req: Request, res: Response) => {
-	const products = await getProductsService()
-	res.json(products)
+export const getProducts = async (req: Request, res: Response) => {
+	try {
+		const result = await getProductsService(req.query)
+		res.json(result)
+	} catch (error: any) {
+		res.status(400).json({ message: error.message })
+	}
 }
 
 export const getProductById = async (req: Request, res: Response) => {
@@ -46,6 +50,10 @@ export const updateProduct = async (req: Request, res: Response) => {
 }
 
 export const deleteProduct = async (req: Request, res: Response) => {
-	await deleteProductService(req.params.id as string)
-	res.json({ message: 'Product deleted' })
+	try {
+		await deleteProductService(req.params.id as string)
+		res.json({ message: 'Product deleted' })
+	} catch (error: any) {
+		res.status(400).json({ message: error.message })
+	}
 }

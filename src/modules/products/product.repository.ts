@@ -4,8 +4,24 @@ export const createProductRepo = (data: any) => {
 	return prisma.product.create({ data })
 }
 
-export const getProductsRepo = () => {
-	return prisma.product.findMany()
+export const getProductsRepo = async (params: {
+	skip: number
+	take: number
+	where: any
+}) => {
+	const { skip, take, where } = params
+
+	const [data, total] = await Promise.all([
+		prisma.product.findMany({
+			where,
+			skip,
+			take,
+			orderBy: { createdAt: 'desc' },
+		}),
+		prisma.product.count(),
+	])
+
+	return { data, total }
 }
 
 export const getProductByIdRepo = (id: string) => {

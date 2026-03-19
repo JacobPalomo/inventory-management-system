@@ -37,7 +37,7 @@ export const createExit = async (req: AuthRequest, res: Response) => {
 	}
 }
 
-export const getMovements = async (_req: AuthRequest, res: Response) => {
-	const movements = await getMovementsService()
+export const getMovements = async (req: AuthRequest, res: Response) => {
+	const movements = await getMovementsService(req.query)
 	res.json(movements)
 }

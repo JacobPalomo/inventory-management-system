@@ -4,16 +4,30 @@ export const createMovementRepo = (data: any) => {
 	return prisma.movement.create({ data })
 }
 
-export const getMovementsRepo = () => {
-	return prisma.movement.findMany({
-		include: {
-			product: true,
-			user: true,
-		},
-		orderBy: {
-			createdAt: 'desc',
-		},
-	})
+export const getMovementsRepo = async (params: {
+	skip: number
+	take: number
+	where: any
+}) => {
+	const { skip, take, where } = params
+
+	const [data, total] = await Promise.all([
+		prisma.movement.findMany({
+			where,
+			include: {
+				product: true,
+				user: true,
+			},
+			skip,
+			take,
+			orderBy: {
+				createdAt: 'desc',
+			},
+		}),
+		prisma.movement.count(),
+	])
+
+	return { data, total }
 }
 
 export const getProductById = (id: string) => {
