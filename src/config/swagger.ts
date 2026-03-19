@@ -140,6 +140,17 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				ToManyRequestsError: {
+					description: 'Demasiadas solicitudes',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+						},
+					},
+				},
+
 				UserExistsError: {
 					description: 'Usuario existente',
 					content: {

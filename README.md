@@ -61,6 +61,8 @@ cd inventory-management-system
 npm install
 ```
 
+---
+
 ## ⚙️ Configuración inicial (personalizable)
 
 El sistema permite configurar valores iniciales mediante variables de entorno.
@@ -157,6 +159,18 @@ Se reitera que seeder es idempotente, por lo que:
 | POST   | /api/products      | Crear producto |
 | POST   | /api/movements/in  | Entrada        |
 | POST   | /api/movements/out | Salida         |
+
+---
+
+## 🔐 Seguridad - Rate Limiting
+
+La API implementa limitación de solicitudes para prevenir abuso:
+
+- Global: 100 requests / 15 minutos
+- Auth: 5 intentos por minuto
+- Movimientos: 20 operaciones por minuto
+
+Esto ayuda a proteger contra ataques de fuerza bruta y uso excesivo del sistema.
 
 ---
 

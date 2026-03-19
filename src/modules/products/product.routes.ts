@@ -48,6 +48,8 @@ router.use(authMiddleware)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
 
@@ -102,6 +104,8 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  *                 totalPages: 5
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.get('/', getProducts)
 
@@ -130,6 +134,8 @@ router.get('/', getProducts)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.get('/:id', getProductById)
 
@@ -161,6 +167,8 @@ router.get('/:id', getProductById)
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
 
@@ -179,6 +187,8 @@ router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.delete('/:id', authorizeRoles('ADMIN'), deleteProduct)
 
