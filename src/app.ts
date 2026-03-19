@@ -24,6 +24,7 @@ app.use(errorMiddleware)
 app.use(morgan('dev'))
 
 // Rate limit
+app.set('trust proxy', 1)
 app.use(globalRateLimiter)
 
 // Swagger Documentation config

@@ -9,10 +9,11 @@ import { Router } from 'express'
 import { createEntry, createExit, getMovements } from './movement.controller'
 import { authMiddleware } from '../../middlewares/auth.middleware'
 import { authorizeRoles } from '../../middlewares/role.middleware'
+import { movementRateLimiter } from '../../middlewares/rateLimit.middleware'
 
 const router = Router()
 
-router.use(authMiddleware)
+router.use([authMiddleware, movementRateLimiter])
 
 /**
  * @swagger
@@ -46,6 +47,8 @@ router.use(authMiddleware)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
 
@@ -83,6 +86,8 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
 
@@ -148,6 +153,8 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *                 $ref: '#/components/schemas/Movement'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.get('/', getMovements)
 
