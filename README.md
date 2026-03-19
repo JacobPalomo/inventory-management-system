@@ -108,13 +108,29 @@ El seeder es idempotente:
 
 ## 🔐 Variables de entorno
 
+### Configuración recomendada para desarrollo:
+
 ```
+NODE_ENV=development
 DATABASE_URL=postgresql://user:password@localhost:5432/inventory_db
 JWT_SECRET=supersecret
 
 ADMIN_EMAIL=admin@test.com
 ADMIN_PASSWORD=123456
 ```
+
+### Configuración recomendada para producción y/o Docker:
+
+```
+NODE_ENV=production
+DATABASE_URL=postgresql://user:password@db:5432/inventory_db
+JWT_SECRET=supersecret
+
+ADMIN_EMAIL=admin@test.com
+ADMIN_PASSWORD=123456
+```
+
+| ⚠️ Se utilizan dos archivos `.env`, uno para docker y otro para desarrollo local, para mantener configuraciones separadas y evitar conflictos. Existen dos archivos `env`: `.env.example` y `.env.docker.example` para facilitar la configuración inicial. Nótese que para la `DATABASE_URL` para docker se utiliza `db` como hostname, que es el nombre del servicio de base de datos definido en `docker-compose.yml`.
 
 ---
 
