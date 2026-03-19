@@ -1,3 +1,4 @@
+import { AppError } from '../../utils/AppError'
 import {
 	createProductRepo,
 	getProductsRepo,
@@ -18,7 +19,7 @@ export const getProductByIdService = async (id: string) => {
 	const product = await getProductByIdRepo(id)
 
 	if (!product) {
-		throw new Error('Product not found')
+		throw new AppError('Product not found', 404)
 	}
 
 	return product

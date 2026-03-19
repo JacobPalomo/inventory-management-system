@@ -1,5 +1,6 @@
 import { prisma } from '../../config/prisma'
-import { MovementType } from '@prisma/client'
+import { Prisma, MovementType } from '@prisma/client'
+import { AppError } from '../../utils/AppError'
 
 export const createMovementService = async (
 	userId: string,
@@ -7,13 +8,13 @@ export const createMovementService = async (
 	productId: string,
 	quantity: number,
 ) => {
-	return prisma.$transaction(async tx => {
+	return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 		const product = await tx.product.findUnique({
 			where: { id: productId },
 		})
 
 		if (!product) {
-			throw new Error('Product not found')
+			throw new AppError('Product not found', 404)
 		}
 
 		let newStock = product.stock
@@ -24,7 +25,7 @@ export const createMovementService = async (
 
 		if (type === 'OUT') {
 			if (product.stock < quantity) {
-				throw new Error('Insufficient stock')
+				throw new AppError('Insufficient stock', 409)
 			}
 			newStock -= quantity
 		}

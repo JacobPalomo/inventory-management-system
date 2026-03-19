@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: inventory_api
+      POSTGRES_PASSWORD: SFDsVIoKhE8aOlMjd2BJjKuyXlCnyGda
+      POSTGRES_DB: inventory_db
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://inventory_api:SFDsVIoKhE8aOlMjd2BJjKuyXlCnyGda@localhost:5432/inventory_db?schema=public
+      JWT_SECRET: K2aGuVLIm3bZLZkestyjNQOfkEGub3XLgotQeJtCCvo=
