@@ -118,6 +118,39 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				InvalidCredentialsError: {
+					description: 'Credenciales inválidas',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+						},
+					},
+				},
+
+				InvalidBodyError: {
+					description: 'Datos inválidos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+						},
+					},
+				},
+
+				UserExistsError: {
+					description: 'Usuario existente',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+						},
+					},
+				},
+
 				ForbiddenError: {
 					description: 'Sin permisos',
 					content: {

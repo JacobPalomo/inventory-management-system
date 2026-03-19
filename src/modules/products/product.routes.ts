@@ -55,17 +55,53 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  * @swagger
  * /api/products:
  *   get:
- *     summary: Obtener lista de productos
+ *     summary: Obtener productos con paginación y filtros
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *         example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         example: 10
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         example: laptop
+ *       - in: query
+ *         name: lowStock
+ *         schema:
+ *           type: boolean
+ *         example: true
+ *       - in: query
+ *         name: isActive
+ *         schema:
+ *           type: boolean
+ *         example: true
  *     responses:
  *       200:
- *         description: Lista de productos
+ *         description: Lista paginada de productos
  *         content:
  *           application/json:
  *             example:
- *               - id: uuid
- *                 name: Laptop
- *                 stock: 10
+ *               data:
+ *                 - id: uuid
+ *                   name: Laptop
+ *                   stock: 5
+ *               meta:
+ *                 total: 50
+ *                 page: 1
+ *                 limit: 10
+ *                 totalPages: 5
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  */
 router.get('/', getProducts)
 
@@ -75,6 +111,8 @@ router.get('/', getProducts)
  *   get:
  *     summary: Obtener producto por ID
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -88,6 +126,8 @@ router.get('/', getProducts)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Product'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
@@ -115,6 +155,10 @@ router.get('/:id', getProductById)
  *     responses:
  *       200:
  *         description: Producto actualizado
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
@@ -131,6 +175,8 @@ router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
  *     responses:
  *       200:
  *         description: Producto eliminado
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */

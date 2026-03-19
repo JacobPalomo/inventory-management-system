@@ -42,6 +42,10 @@ router.use(authMiddleware)
  *                 stock: 15
  *       400:
  *         description: Error en datos
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
 
@@ -75,6 +79,10 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *                 stock: 8
  *       400:
  *         description: Stock insuficiente
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
 
@@ -84,6 +92,8 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *   get:
  *     summary: Obtener historial de movimientos
  *     tags: [Movements]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de movimientos
@@ -93,6 +103,8 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Movement'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  */
 router.get('/', getMovements)
 
