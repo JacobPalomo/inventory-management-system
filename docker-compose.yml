@@ -17,6 +17,6 @@ services:
       - '3000:3000'
     depends_on:
       - db
-    environment:
-      DATABASE_URL: postgresql://inventory_api:SFDsVIoKhE8aOlMjd2BJjKuyXlCnyGda@localhost:5432/inventory_db?schema=public
-      JWT_SECRET: K2aGuVLIm3bZLZkestyjNQOfkEGub3XLgotQeJtCCvo=
+    env_file:
+      - .env
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/app.js"

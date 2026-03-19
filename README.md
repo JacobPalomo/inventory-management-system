@@ -61,6 +61,47 @@ cd inventory-management-system
 npm install
 ```
 
+## ⚙️ Configuración inicial (personalizable)
+
+El sistema permite configurar valores iniciales mediante variables de entorno.
+
+### 👤 Usuario administrador
+
+Puedes definir las credenciales del usuario administrador inicial:
+
+```env
+ADMIN_EMAIL=admin@test.com
+ADMIN_PASSWORD=123456
+```
+
+### 🔧 Valores por defecto
+
+Si no se especifican variables de entorno, el sistema utilizará:
+
+- Email: `admin@test.com`
+- Password: `123456`
+
+---
+
+### 🚀 Generar usuario administrador
+
+Ejecuta:
+
+```bash
+npx prisma db seed
+```
+
+Esto creará el usuario administrador si no existe previamente.
+
+---
+
+### 🧠 Comportamiento
+
+El seeder es idempotente:
+
+- No duplica usuarios
+- Puede ejecutarse múltiples veces sin generar conflictos
+
 ---
 
 ## 🔐 Variables de entorno
@@ -68,6 +109,9 @@ npm install
 ```
 DATABASE_URL=postgresql://user:password@localhost:5432/inventory_db
 JWT_SECRET=supersecret
+
+ADMIN_EMAIL=admin@test.com
+ADMIN_PASSWORD=123456
 ```
 
 ---
@@ -80,11 +124,28 @@ npm run dev
 
 ---
 
-## 🐳 Docker
+## 🐳 Uso con Docker
 
 ```bash
 docker-compose up --build
 ```
+
+---
+
+### ⚙️ Inicialización automática
+
+Al iniciar el contenedor, el sistema ejecuta:
+
+- Migraciones de base de datos
+- Seeder inicial
+
+Se reitera que seeder es idempotente, por lo que:
+
+- No genera duplicados
+- No sobrescribe datos existentes
+- Puede ejecutarse múltiples veces de forma segura
+
+| El proceso de inicialización de datos se mantiene explícito para mayor control en entornos de desarrollo y producción.
 
 ---
 
