@@ -9,8 +9,11 @@ import { Router } from 'express'
 import { register, login } from './auth.controller'
 import { authorizeRoles } from '../../middlewares/role.middleware'
 import { authMiddleware } from '../../middlewares/auth.middleware'
+import { authRateLimiter } from '../../middlewares/rateLimit.middleware'
 
 const router = Router()
+
+router.use(authRateLimiter)
 
 /**
  * @swagger
@@ -34,6 +37,8 @@ const router = Router()
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
  *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.post('/login', login)
 
@@ -68,6 +73,8 @@ router.use(authMiddleware)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       429:
+ *         $ref: '#/components/responses/ToManyRequestsError'
  */
 router.post('/register', authorizeRoles('ADMIN'), register)
 
