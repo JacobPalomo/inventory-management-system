@@ -21,7 +21,11 @@ app.use(express.json())
 
 // Logging & Error Management config
 app.use(errorMiddleware)
-app.use(morgan('dev'))
+app.use(
+	morgan('dev', {
+		skip: req => req.originalUrl.startsWith('/api/docs'),
+	}),
+)
 
 // Rate limit
 app.set('trust proxy', 1)

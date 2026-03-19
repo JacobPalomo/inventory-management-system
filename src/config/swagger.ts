@@ -1,4 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc'
+import { env } from './env'
 
 export const swaggerSpec = swaggerJsdoc({
 	definition: {
@@ -191,5 +192,5 @@ export const swaggerSpec = swaggerJsdoc({
 		{ name: 'Products', description: 'Gestión de productos' },
 		{ name: 'Movements', description: 'Movimientos de inventario' },
 	],
-	apis: ['./src/modules/**/*.ts'],
+	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],
 })
