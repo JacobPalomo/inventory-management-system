@@ -94,6 +94,49 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *     tags: [Movements]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *         example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         example: 10
+ *       - in: query
+ *         name: productId
+ *         schema:
+ *           type: string
+ *         example: "123"
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         example: laptop
+ *       - in: query
+ *         name: movementType
+ *         schema:
+ *           type: string
+ *           enum: [IN, OUT]
+ *         required: false
+ *         description: Tipo de movimiento (IN = entrada, OUT = salida)
+ *         example: IN
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Fecha inicial en formato YYYY-MM-DD (zona horaria local)
+ *         example: "2026-03-18"
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Fecha final en formato YYYY-MM-DD (zona horaria local)
+ *         example: "2026-03-19"
  *     responses:
  *       200:
  *         description: Lista de movimientos
