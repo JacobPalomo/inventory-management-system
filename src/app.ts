@@ -1,14 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-
-// Logging & Error Management imports
-import { errorMiddleware } from './middlewares/error.middleware'
 import morgan from 'morgan'
-
-// Swagger Documentation imports
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from './config/swagger'
+import { errorMiddleware } from './middlewares/error.middleware'
+import { globalRateLimiter } from './middlewares/rateLimit.middleware'
 
 // Route imports
 import authRoutes from './modules/auth/auth.routes'
@@ -25,6 +22,9 @@ app.use(express.json())
 // Logging & Error Management config
 app.use(errorMiddleware)
 app.use(morgan('dev'))
+
+// Rate limit
+app.use(globalRateLimiter)
 
 // Swagger Documentation config
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
