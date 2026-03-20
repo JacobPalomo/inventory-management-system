@@ -1,10 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
-import swaggerUi from 'swagger-ui-express'
-import { swaggerSpec } from './config/swagger'
-import { errorMiddleware } from './middlewares/error.middleware'
 import { globalRateLimiter } from './middlewares/rateLimit.middleware'
+import { setupDocs } from './docs'
+import { errorMiddleware } from './middlewares/error.middleware'
 
 // Route imports
 import authRoutes from './modules/auth/auth.routes'
@@ -17,8 +16,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Logging & Error Management config
-app.use(errorMiddleware)
+// Logging
 app.use(
 	morgan('dev', {
 		skip: req => req.originalUrl.startsWith('/api/docs'),
@@ -29,14 +27,17 @@ app.use(
 app.set('trust proxy', 1)
 app.use(globalRateLimiter)
 
-// Swagger Documentation config
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+// Documentation config
+setupDocs(app)
 
 // Routes config
 app.use('/api/auth', authRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
+
+// Error Management
+app.use(errorMiddleware)
 
 app.get('/', (_req, res) => {
 	res.send('API running 🚀')

@@ -27,6 +27,11 @@ export const swaggerSpec = swaggerJsdoc({
 			},
 
 			schemas: {
+				Role: {
+					type: 'string',
+					enum: ['ADMIN', 'EDITOR', 'VIEWER'],
+				},
+
 				// 🔐 USER
 				User: {
 					type: 'object',
@@ -38,6 +43,13 @@ export const swaggerSpec = swaggerJsdoc({
 							type: 'string',
 							enum: ['ADMIN', 'EDITOR', 'VIEWER'],
 						},
+						shiftId: { type: 'string', example: 'uuid-shift' },
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-19T23:57:02.901Z',
+						},
+						createdById: { type: 'string', example: 'uuid-user' },
 					},
 				},
 
@@ -67,6 +79,7 @@ export const swaggerSpec = swaggerJsdoc({
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
+							format: 'date-time',
 							example: '2025-01-01T00:00:00Z',
 						},
 					},
@@ -84,6 +97,7 @@ export const swaggerSpec = swaggerJsdoc({
 						quantity: { type: 'number', example: 5 },
 						createdAt: {
 							type: 'string',
+							format: 'date-time',
 							example: '2025-01-01T00:00:00Z',
 						},
 						product: {
@@ -131,7 +145,7 @@ export const swaggerSpec = swaggerJsdoc({
 				},
 
 				InvalidBodyError: {
-					description: 'Datos inválidos',
+					description: 'Error en el cuerpo de la solicitud',
 					content: {
 						'application/json': {
 							schema: {
@@ -186,11 +200,13 @@ export const swaggerSpec = swaggerJsdoc({
 				},
 			},
 		},
+
+		tags: [
+			{ name: 'Auth', description: 'Autenticación' },
+			{ name: 'Users', description: 'Gestión de usuarios' },
+			{ name: 'Products', description: 'Gestión de productos' },
+			{ name: 'Movements', description: 'Movimientos de inventario' },
+		],
 	},
-	tags: [
-		{ name: 'Auth', description: 'Autenticación' },
-		{ name: 'Products', description: 'Gestión de productos' },
-		{ name: 'Movements', description: 'Movimientos de inventario' },
-	],
 	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],
 })
