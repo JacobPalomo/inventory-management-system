@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import morgan from 'morgan'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from './config/swagger'
@@ -11,8 +10,6 @@ import { globalRateLimiter } from './middlewares/rateLimit.middleware'
 import authRoutes from './modules/auth/auth.routes'
 import productsRoutes from './modules/products/product.routes'
 import movementsRoutes from './modules/movements/movement.routes'
-
-dotenv.config()
 
 const app = express()
 
