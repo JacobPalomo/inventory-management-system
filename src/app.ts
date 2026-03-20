@@ -8,6 +8,7 @@ import { globalRateLimiter } from './middlewares/rateLimit.middleware'
 
 // Route imports
 import authRoutes from './modules/auth/auth.routes'
+import usersRoutes from './modules/users/user.routes'
 import productsRoutes from './modules/products/product.routes'
 import movementsRoutes from './modules/movements/movement.routes'
 
@@ -33,6 +34,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Routes config
 app.use('/api/auth', authRoutes)
+app.use('/api/users', usersRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
 

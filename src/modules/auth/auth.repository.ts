@@ -5,14 +5,3 @@ export const findUserByEmail = async (email: string) => {
 		where: { email },
 	})
 }
-
-export const createUser = async (data: {
-	name: string
-	email: string
-	password: string
-	role?: any
-}) => {
-	return prisma.user.create({
-		data,
-	})
-}
