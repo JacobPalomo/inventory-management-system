@@ -190,6 +190,69 @@ Esto ayuda a proteger contra ataques de fuerza bruta y uso excesivo del sistema.
 
 ---
 
+## 👤 Gestión de usuarios
+
+El registro de usuarios ya no se realiza desde el módulo de autenticación.
+
+Ahora, los usuarios son gestionados a través del módulo de usuarios, permitiendo un mayor control y alineación con roles administrativos.
+
+---
+
+### ➕ Crear usuario
+
+```http
+POST /api/users
+```
+
+Requiere autenticación y permisos de administrador.
+
+---
+
+### 🔐 Actualización de contraseña
+
+El sistema soporta dos flujos:
+
+#### 👤 Usuario autenticado
+
+```http
+PATCH /api/users/me/password
+```
+
+Requiere:
+
+- contraseña actual
+- nueva contraseña
+
+---
+
+#### 🛠️ Administrador
+
+```http
+PATCH /api/users/:id/password
+```
+
+Permite cambiar la contraseña de cualquier usuario sin requerir la contraseña actual.
+
+---
+
+### 🧠 Nota
+
+Este enfoque mejora la seguridad y el control de usuarios dentro del sistema, evitando registros abiertos y centralizando la gestión en usuarios con permisos adecuados.
+
+---
+
+## 📚 Documentación de la API
+
+El sistema incluye dos herramientas de documentación:
+
+- Swagger UI (documentación interactiva):
+  👉 `/api/docs`
+
+- Redoc (documentación limpia):
+  👉 `/docs`
+
+---
+
 ## 👨‍💻 Autor
 
 Desarrollado por Jacob Palomo.
