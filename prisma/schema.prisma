@@ -8,13 +8,51 @@ datasource db {
 }
 
 model User {
-    id        String     @id @default(uuid())
-    name      String
-    email     String     @unique
-    password  String
-    role      Role       @default(VIEWER)
-    createdAt DateTime   @default(now())
+    id       String @id @default(uuid())
+    name     String
+    email    String @unique
+    password String
+    role     Role   @default(VIEWER)
+
+    shiftId     String?
+    shift       Shift?       @relation(fields: [shiftId], references: [id])
+    attendances Attendance[]
+
     movements Movement[]
+
+    createdAt DateTime @default(now())
+
+    createdById  String?
+    createdBy    User?   @relation("UserCreatedBy", fields: [createdById], references: [id])
+    usersCreated User[]  @relation("UserCreatedBy")
+}
+
+model Shift {
+    id        String  @id @default(uuid())
+    name      String // Ej: "Turno Matutino"
+    startTime Int // 0 - 1440
+    endTime   Int
+    isActive  Boolean @default(true)
+
+    createdAt DateTime @default(now())
+
+    users       User[]
+    attendances Attendance[]
+}
+
+model Attendance {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    shiftId String?
+    shift   Shift?  @relation(fields: [shiftId], references: [id])
+
+    checkIn  DateTime
+    checkOut DateTime?
+
+    createdAt DateTime @default(now())
 }
 
 model Product {
