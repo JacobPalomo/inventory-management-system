@@ -16,7 +16,7 @@ export interface TZodCreateProduct {
 
 export interface TCreateProduct {
 	name: string
-	description: string
+	description?: string
 	stock: number
 	minStock: number
 }
@@ -24,8 +24,8 @@ export interface TCreateProduct {
 export interface TZodUpdateProduct {
 	name?: z.ZodOptional<z.ZodString>
 	description?: z.ZodOptional<z.ZodString>
-	stock?: z.ZodOptional<z.ZodNumber>
 	minStock?: z.ZodOptional<z.ZodNumber>
+	isActive?: z.ZodOptional<z.ZodBoolean>
 }
 
 export interface TUpdateProduct extends Partial<TCreateProduct> {}

@@ -197,12 +197,12 @@ router.get('/:id', getProductById)
  *               description:
  *                 type: string
  *                 example: 16GB RAM
- *               stock:
- *                 type: number
- *                 example: 10
  *               minStock:
  *                 type: number
  *                 example: 3
+ *               isActive:
+ *                 type: boolean
+ *                 example: false
  *           example:
  *             name: Laptop actualizada
  *             minStock: 5
