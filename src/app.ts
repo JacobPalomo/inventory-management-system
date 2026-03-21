@@ -8,6 +8,7 @@ import { errorMiddleware } from './middlewares/error.middleware'
 // Route imports
 import authRoutes from './modules/auth/auth.routes'
 import usersRoutes from './modules/users/user.routes'
+import shiftsRoutes from './modules/shifts/shift.routes'
 import productsRoutes from './modules/products/product.routes'
 import movementsRoutes from './modules/movements/movement.routes'
 
@@ -33,6 +34,7 @@ setupDocs(app)
 // Routes config
 app.use('/api/auth', authRoutes)
 app.use('/api/users', usersRoutes)
+app.use('/api/shifts', shiftsRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
 

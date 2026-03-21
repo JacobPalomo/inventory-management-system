@@ -53,6 +53,23 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				// ⏱️ SHIFT
+				Shift: {
+					type: 'object',
+					properties: {
+						id: { type: 'string', example: 'uuid-shift' },
+						name: { type: 'string', example: 'Matutino' },
+						startTime: { type: 'number', example: '08:00' }, // 480 en minutos
+						endTime: { type: 'number', example: '16:30' }, // 990 en minutos
+						isActive: { type: 'boolean', example: true },
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-19T23:57:02.901Z',
+						},
+					},
+				},
+
 				// 🔐 AUTH RESPONSE
 				AuthResponse: {
 					type: 'object',
@@ -204,6 +221,7 @@ export const swaggerSpec = swaggerJsdoc({
 		tags: [
 			{ name: 'Auth', description: 'Autenticación' },
 			{ name: 'Users', description: 'Gestión de usuarios' },
+			{ name: 'Shifts', description: 'Turnos de empleados' },
 			{ name: 'Products', description: 'Gestión de productos' },
 			{ name: 'Movements', description: 'Movimientos de inventario' },
 		],
