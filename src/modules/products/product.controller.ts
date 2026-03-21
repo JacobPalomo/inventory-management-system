@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductService,
@@ -9,22 +9,25 @@ import {
 } from './product.service'
 import { createProductSchema, updateProductSchema } from './product.schema'
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const validated = createProductSchema.parse(req.body) as TCreateProduct
 		const product = await createProductService(validated)
 		res.status(201).json(product)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const { page, limit, search, isActive, lowStock } = req.query
 
@@ -38,31 +41,29 @@ export const getProducts = async (req: Request, res: Response) => {
 
 		const result = await getProductsService(query)
 		res.json(result)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const getProductById = async (req: Request, res: Response) => {
+export const getProductById = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const product = await getProductByIdService(req.params.id as string)
 		res.json(product)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const validated = updateProductSchema.parse(req.body) as TUpdateProduct
 		const product = await updateProductService(
@@ -70,26 +71,20 @@ export const updateProduct = async (req: Request, res: Response) => {
 			validated,
 		)
 		res.json(product)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		await deleteProductService(req.params.id as string)
 		res.json({ message: 'Product deleted' })
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }

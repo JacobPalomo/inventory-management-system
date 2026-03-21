@@ -1,11 +1,15 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import { MovementType } from '@prisma/client'
 import { AuthRequest } from '../../middlewares/auth.middleware'
 import { createMovementService, getMovementsService } from './movement.service'
 import { movementSchema } from './movement.schema'
 import { MovementQuery } from './movement.types'
 
-export const createEntry = async (req: AuthRequest, res: Response) => {
+export const createEntry = async (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const { productId, quantity } = movementSchema.parse(req.body)
 
@@ -17,17 +21,16 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
 		)
 
 		res.status(201).json(result)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const createExit = async (req: AuthRequest, res: Response) => {
+export const createExit = async (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const { productId, quantity } = movementSchema.parse(req.body)
 
@@ -39,17 +42,16 @@ export const createExit = async (req: AuthRequest, res: Response) => {
 		)
 
 		res.status(201).json(result)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }
 
-export const getMovements = async (req: AuthRequest, res: Response) => {
+export const getMovements = async (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const { page, limit, search, movementType, productId, userId, from, to } =
 			req.query
@@ -67,12 +69,7 @@ export const getMovements = async (req: AuthRequest, res: Response) => {
 
 		const movements = await getMovementsService(query)
 		res.json(movements)
-	} catch (error: any) {
-		console.log(error)
-		if (error.name === 'ZodError')
-			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else if (error.statusCode)
-			res.status(error.statusCode).json({ message: error.message })
-		else res.status(500).json(error)
+	} catch (error) {
+		next(error)
 	}
 }

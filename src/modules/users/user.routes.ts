@@ -65,7 +65,7 @@ router.use(authMiddleware)
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -119,7 +119,22 @@ router.get('/', authorizeRoles(Role.ADMIN, Role.EDITOR), getUsers)
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               validationError:
+ *                 value:
+ *                   code: 'VALIDATION_ERROR'
+ *                   message: 'Error de validación'
+ *                   details:
+ *                     - field: 'nombre_del_campo'
+ *                       message: 'Mensaje de error en ese campo'
+ *               userAlreadyExistsError:
+ *                 value:
+ *                   code: 'USER_ALREADY_EXISTS'
+ *                   message: 'El usuario ya existe'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
@@ -127,7 +142,7 @@ router.get('/', authorizeRoles(Role.ADMIN, Role.EDITOR), getUsers)
  *       409:
  *         $ref: '#/components/responses/UserAlreadyExistsError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -179,13 +194,30 @@ router.post('/', authorizeRoles(Role.ADMIN), createUser)
  *             schema:
  *               $ref: '#/components/schemas/User'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               validationError:
+ *                 value:
+ *                   code: 'VALIDATION_ERROR'
+ *                   message: 'Error de validación'
+ *                   details:
+ *                     - field: 'nombre_del_campo'
+ *                       message: 'Mensaje de error en ese campo'
+ *               userAlreadyExistsError:
+ *                 value:
+ *                   code: 'USER_ALREADY_EXISTS'
+ *                   message: 'El usuario ya existe'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/UserNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -231,13 +263,34 @@ router.put('/:id', authorizeRoles(Role.ADMIN), updateUser)
  *             example:
  *               message: Contraseña actualizada correctamente
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               validationError:
+ *                 value:
+ *                   code: 'VALIDATION_ERROR'
+ *                   message: 'Error de validación'
+ *                   details:
+ *                     - field: 'nombre_del_campo'
+ *                       message: 'Mensaje de error en ese campo'
+ *               userInvalidCurrentPasswordError:
+ *                 value:
+ *                   code: 'USER_INVALID_CURRENT_PASSWORD'
+ *                   message: 'La contraseña actual es incorrecta'
+ *               userSamePasswordError:
+ *                 value:
+ *                   code: 'USER_SAME_PASSWORD'
+ *                   message: 'La nueva contraseña es igual a la contraseña actual'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/UserNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -288,13 +341,15 @@ router.patch('/me/password', updateMyPassword)
  *             example:
  *               message: Contraseña actualizada correctamente el administrador
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/UserNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -335,8 +390,10 @@ router.patch('/:id/password', authorizeRoles(Role.ADMIN), adminUpdatePassword)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/UserNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

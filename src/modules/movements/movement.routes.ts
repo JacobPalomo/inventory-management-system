@@ -113,13 +113,13 @@ router.use([authMiddleware, movementRateLimiter])
  *                 isActive: true
  *                 createdAt: 2026-03-19T05:00:24.585Z
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -223,13 +223,13 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *                 isActive: true
  *                 createdAt: 2026-03-19T05:00:24.585Z
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -298,7 +298,7 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

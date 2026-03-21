@@ -48,11 +48,11 @@ router.use(authRateLimiter)
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/InvalidCredentialsError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

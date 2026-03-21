@@ -70,13 +70,13 @@ router.use(authMiddleware)
  *             schema:
  *               $ref: '#/components/schemas/Product'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  */
 router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
 
@@ -126,7 +126,7 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -158,9 +158,9 @@ router.get('/', getProducts)
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         $ref: '#/components/responses/ProductNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -215,15 +215,15 @@ router.get('/:id', getProductById)
  *             schema:
  *               $ref: '#/components/schemas/Product'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         $ref: '#/components/responses/ProductNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -266,9 +266,9 @@ router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         $ref: '#/components/responses/ProductNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

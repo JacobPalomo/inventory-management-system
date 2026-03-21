@@ -67,7 +67,7 @@ export const getProductByIdService = async (id: string): Promise<Product> => {
 	const product = await getProductByIdRepo(id)
 
 	if (!product) {
-		throw new AppError('Producto no encontrado', 404)
+		throw new AppError('PRODUCT_NOT_FOUND')
 	}
 
 	return product
@@ -80,6 +80,8 @@ export const updateProductService = async (
 	return updateProductRepo(id, data)
 }
 
-export const deleteProductService = async (id: string): Promise<Product> => {
-	return deleteProductRepo(id)
+export const deleteProductService = async (id: string) => {
+	await deleteProductRepo(id)
+
+	return { message: 'El producto fue eliminado correctamente' }
 }

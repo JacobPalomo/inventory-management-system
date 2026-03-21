@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '../utils/AppError'
 
 export const errorMiddleware = (
 	err: any,
@@ -7,15 +6,32 @@ export const errorMiddleware = (
 	res: Response,
 	_next: NextFunction,
 ) => {
-	if (err instanceof AppError) {
+	// ⚠️ SI YA RESPONDISTE → SALIR
+	if (res.headersSent) {
+		return
+	}
+
+	// ZOD
+	if (err.name === 'ZodError') {
+		return res.status(400).json({
+			code: 'VALIDATION_ERROR',
+			message: 'Error de validación',
+		})
+	}
+
+	// APP ERROR
+	if (err.statusCode) {
 		return res.status(err.statusCode).json({
+			code: err.code || 'BAD_REQUEST',
 			message: err.message,
 		})
 	}
 
+	// FALLBACK
 	console.error(err)
 
 	return res.status(500).json({
-		message: 'Internal Server Error',
+		code: 'INTERNAL_SERVER_ERROR',
+		message: 'Error interno del servidor',
 	})
 }

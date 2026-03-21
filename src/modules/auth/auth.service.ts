@@ -8,13 +8,13 @@ export const loginService = async (email: string, password: string) => {
 	const user = await findUserByEmail(email)
 
 	if (!user) {
-		throw new AppError('Credenciales inválidas', 401)
+		throw new AppError('INVALID_CREDENTIALS')
 	}
 
 	const isValid = await comparePassword(password, user.password)
 
 	if (!isValid) {
-		throw new AppError('Credenciales inválidas', 401)
+		throw new AppError('INVALID_CREDENTIALS')
 	}
 
 	const token = jwt.sign(

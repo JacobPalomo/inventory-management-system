@@ -286,21 +286,7 @@ export const swaggerSpec = swaggerJsdoc({
 			},
 
 			responses: {
-				UnauthorizedError: {
-					description: 'No autorizado',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
-							},
-							example: {
-								code: 'UNAUTHORIZED',
-								message: 'No autorizado',
-							},
-						},
-					},
-				},
-
+				// AUTH
 				InvalidCredentialsError: {
 					description: 'Credenciales inválidas',
 					content: {
@@ -316,52 +302,16 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
-				InvalidBodyError: {
-					description: 'Error en el cuerpo de la solicitud',
+				UnauthorizedError: {
+					description: 'No autorizado',
 					content: {
 						'application/json': {
 							schema: {
 								$ref: '#/components/schemas/Error',
 							},
 							example: {
-								code: 'VALIDATION_ERROR',
-								message: 'Error en el cuerpo de la solicitud',
-								details: [
-									{
-										field: 'field_name',
-										message: 'Field error message',
-									},
-								],
-							},
-						},
-					},
-				},
-
-				ToManyRequestsError: {
-					description: 'Demasiadas solicitudes',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
-							},
-							example: {
-								code: 'TOO_MANY_REQUESTS',
-								message: 'Demasiadas solicitudes',
-							},
-						},
-					},
-				},
-
-				UserAlreadyExistsError: {
-					description: 'Usuario ya existente',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
-							},
-							example: {
-								code: 'USER_ALREADY_EXISTS',
-								message: 'Usuario ya existente',
+								code: 'UNAUTHORIZED',
+								message: 'No autorizado',
 							},
 						},
 					},
@@ -382,16 +332,161 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
-				NotFoundError: {
-					description: 'Recurso no encontrado',
+				// USERS
+				UserNotFoundError: {
+					description: 'Usuario no encontrado',
 					content: {
 						'application/json': {
 							schema: {
 								$ref: '#/components/schemas/Error',
 							},
 							example: {
-								code: 'NOT_FOUND',
-								message: 'Recurso no encontrado',
+								code: 'USER_NOT_FOUND',
+								message: 'Usuario no encontrado',
+							},
+						},
+					},
+				},
+
+				UserAlreadyExistsError: {
+					description: 'Usuario ya existe',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_ALREADY_EXISTS',
+								message: 'Usuario ya existe',
+							},
+						},
+					},
+				},
+
+				UserInvalidCurrentPasswordError: {
+					description: 'La contraseña actual es incorrecta',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_INVALID_CURRENT_PASSWORD',
+								message: 'La contraseña actual es incorrecta',
+							},
+						},
+					},
+				},
+
+				UserSamePasswordError: {
+					description: 'La nueva contraseña es igual a la contraseña actual',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_SAME_PASSWORD',
+								message: 'La nueva contraseña es igual a la contraseña actual',
+							},
+						},
+					},
+				},
+
+				// PRODUCTS
+				ProductNotFoundError: {
+					description: 'Producto no encontrado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_NOT_FOUND',
+								message: 'Producto no encontrado',
+							},
+						},
+					},
+				},
+
+				ProductInsufficientStockError: {
+					description: 'Stock insuficiente',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_INSUFFICIENT_STOCK',
+								message: 'Stock insuficiente',
+							},
+						},
+					},
+				},
+
+				// SHIFTS
+				ShiftNotFoundError: {
+					description: 'Turno no encontrado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SHIFT_NOT_FOUND',
+								message: 'Turno no encontrado',
+							},
+						},
+					},
+				},
+
+				ShiftOverlapError: {
+					description: 'El turno se solapa con otro existente',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SHIFT_OVERLAP',
+								message: 'El turno se solapa con otro existente',
+							},
+						},
+					},
+				},
+
+				// GENERIC
+				ValidationError: {
+					description: 'Error de validación',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'VALIDATION_ERROR',
+								message: 'Error de validación',
+								details: [
+									{
+										field: 'nombre_del_campo',
+										message: 'Mensaje del error en ese campo',
+									},
+								],
+							},
+						},
+					},
+				},
+
+				TooManyRequestsError: {
+					description: 'Demasiadas solicitudes',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'TOO_MANY_REQUESTS',
+								message: 'Demasiadas solicitudes',
 							},
 						},
 					},

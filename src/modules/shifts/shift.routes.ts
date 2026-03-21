@@ -63,13 +63,13 @@ router.use(authMiddleware)
  *             schema:
  *               $ref: '#/components/schemas/PaginatedShifts'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -122,13 +122,13 @@ router.use(authorizeRoles(Role.ADMIN))
  *             schema:
  *               $ref: '#/components/schemas/Shift'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -184,15 +184,15 @@ router.post('/', createShift)
  *             schema:
  *               $ref: '#/components/schemas/Shift'
  *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         $ref: '#/components/responses/ShiftNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
@@ -234,9 +234,9 @@ router.put('/:id', updateShift)
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         $ref: '#/components/responses/ShiftNotFoundError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */
