@@ -14,7 +14,6 @@ import {
 import {
 	createUserRepo,
 	findUserByEmailRepo,
-	findAdminByIdRepo,
 	findUserByIdRepo,
 	updateUserRepo,
 	getUsersRepo,
@@ -57,14 +56,6 @@ export const getUsersService = async (
 export const createUserService = async (
 	data: TCreateUser,
 ): Promise<SafeUserResponse> => {
-	// Validar que la información venga con el ID del usuario administrador
-	if (!data.createdById)
-		throw new AppError('No se obtuvo el id del usuario administrador', 400)
-
-	// Validar usuario administrado que está creando al nuevo usuario
-	const admin = await findAdminByIdRepo(data.createdById)
-	if (!admin) throw new AppError('Usuario administrador inválido', 400)
-
 	// Validar que no exista un usuario con ese mismo correo
 	const existingUser = await findUserByEmailRepo(data.email)
 	if (existingUser) throw new AppError('Usuario existente', 409)
