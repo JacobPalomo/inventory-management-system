@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductService,
 	getProductsService,
@@ -10,7 +11,7 @@ import { createProductSchema, updateProductSchema } from './product.schema'
 
 export const createProduct = async (req: Request, res: Response) => {
 	try {
-		const validated = createProductSchema.parse(req.body)
+		const validated = createProductSchema.parse(req.body) as TCreateProduct
 		const product = await createProductService(validated)
 		res.status(201).json(product)
 	} catch (error: any) {
@@ -20,7 +21,17 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: Request, res: Response) => {
 	try {
-		const result = await getProductsService(req.query)
+		const { page, limit, search, isActive, lowStock } = req.query
+
+		const query: ProductQuery = {
+			page: page as string,
+			limit: limit as string,
+			search: search as string,
+			isActive: isActive as string,
+			lowStock: lowStock as string,
+		}
+
+		const result = await getProductsService(query)
 		res.json(result)
 	} catch (error: any) {
 		res.status(400).json({ message: error.message })
@@ -38,7 +49,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
 	try {
-		const validated = updateProductSchema.parse(req.body)
+		const validated = updateProductSchema.parse(req.body) as TUpdateProduct
 		const product = await updateProductService(
 			req.params.id as string,
 			validated,

@@ -1,5 +1,16 @@
+import { Prisma } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
 import { comparePassword, hashPassword } from '../../utils/hash'
+import { PaginatedResponse } from '../../types/pagination'
+import {
+	SafeUserResponse,
+	TAdminUpdatePassword,
+	TCreateUser,
+	TUpdatePassword,
+	TUpdateUser,
+	UserQuery,
+	UserResponse,
+} from './user.types'
 import {
 	createUserRepo,
 	findUserByEmailRepo,
@@ -10,20 +21,16 @@ import {
 	deleteUserRepo,
 	updatePasswordRepo,
 } from './user.repository'
-import {
-	TAdminUpdatePassword,
-	TCreateUser,
-	TUpdatePassword,
-	TUpdateUser,
-} from './user.types'
 
-export const getUsersService = async (query: any) => {
+export const getUsersService = async (
+	query: UserQuery,
+): Promise<PaginatedResponse<UserResponse>> => {
 	const page = parseInt(query.page) || 1
 	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
 
 	const search = query.search || ''
-	const where: any = {
+	const where: Prisma.UserWhereInput = {
 		name: {
 			contains: search,
 			mode: 'insensitive',
@@ -47,7 +54,9 @@ export const getUsersService = async (query: any) => {
 	}
 }
 
-export const createUserService = async (data: TCreateUser) => {
+export const createUserService = async (
+	data: TCreateUser,
+): Promise<SafeUserResponse> => {
 	// Validar que la información venga con el ID del usuario administrador
 	if (!data.createdById)
 		throw new AppError('No se obtuvo el id del usuario administrador', 400)
@@ -73,7 +82,10 @@ export const createUserService = async (data: TCreateUser) => {
 	return safeUser
 }
 
-export const updateUserService = async (id: string, data: TUpdateUser) => {
+export const updateUserService = async (
+	id: string,
+	data: TUpdateUser,
+): Promise<SafeUserResponse> => {
 	// Validamos que el usuario exista
 	const user = await findUserByIdRepo(id)
 	if (!user) throw new AppError('El usuario no existe', 404)
@@ -134,5 +146,9 @@ export const deleteUserService = async (id: string) => {
 	const user = await findUserByIdRepo(id)
 	if (!user) throw new AppError('El usuario no existe', 404)
 
-	return deleteUserRepo(id)
+	await deleteUserRepo(id)
+
+	return {
+		message: 'Usuario eliminado correctamente',
+	}
 }

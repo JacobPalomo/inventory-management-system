@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client'
+import { Prisma, Role } from '@prisma/client'
 import { prisma } from '../../config/prisma'
 import { TCreateUser, TUpdatePassword, TUpdateUser } from './user.types'
 
@@ -17,7 +17,7 @@ export const findUserByEmailRepo = async (email: string) => {
 export const getUsersRepo = async (params: {
 	skip: number
 	take: number
-	where: any
+	where: Prisma.UserWhereInput
 }) => {
 	const { skip, take, where } = params
 

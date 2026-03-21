@@ -1,5 +1,50 @@
 import { Role } from '@prisma/client'
 import z from 'zod'
+import { PaginationQuery } from '../../types/pagination'
+
+export interface UserQuery extends PaginationQuery {
+	search?: string
+}
+
+export interface UserResponse {
+	id: string
+	email: string
+	name: string
+	role: Role
+	shiftId: string | null
+	createdAt: Date
+	createdById: string | null
+	shift: {
+		id: string
+		name: string
+		createdAt: Date
+		startTime: number
+		endTime: number
+		isActive: boolean
+	} | null
+	createdBy: {
+		id: string
+		email: string
+		name: string
+		role: Role
+	} | null
+	usersCreated: {
+		id: string
+		email: string
+		name: string
+		role: Role
+	}[]
+}
+
+export interface SafeUserResponse {
+	id: string
+	name: string
+	email: string
+	role: Role
+	shiftId: string | null
+	createdAt: Date
+	createdById: string | null
+}
 
 export interface TZodCreateUser {
 	name: z.ZodString

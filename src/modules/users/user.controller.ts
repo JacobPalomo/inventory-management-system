@@ -18,13 +18,22 @@ import {
 	TCreateUser,
 	TUpdatePassword,
 	TUpdateUser,
+	UserQuery,
 } from './user.types'
 import { AuthRequest } from '../../middlewares/auth.middleware'
 import { AppError } from '../../utils/AppError'
 
 export const getUsers = async (req: Request, res: Response) => {
 	try {
-		const result = await getUsersService(req.query)
+		const { page, limit, search } = req.query
+
+		const query: UserQuery = {
+			page: page as string,
+			limit: limit as string,
+			search: search as string,
+		}
+
+		const result = await getUsersService(query)
 		res.json(result)
 	} catch (error: any) {
 		console.log(error)

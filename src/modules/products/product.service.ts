@@ -1,4 +1,7 @@
+import { Product } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
+import { PaginatedResponse } from '../../types/pagination'
+import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductRepo,
 	getProductsRepo,
@@ -7,11 +10,15 @@ import {
 	deleteProductRepo,
 } from './product.repository'
 
-export const createProductService = async (data: any) => {
+export const createProductService = async (
+	data: TCreateProduct,
+): Promise<Product> => {
 	return createProductRepo(data)
 }
 
-export const getProductsService = async (query: any) => {
+export const getProductsService = async (
+	query: ProductQuery,
+): Promise<PaginatedResponse<Product>> => {
 	const page = parseInt(query.page) || 1
 	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
@@ -40,7 +47,8 @@ export const getProductsService = async (query: any) => {
 		where,
 	})
 
-	const lowStock = query.lowStock === 'true'
+	const lowStock =
+		query.lowStock !== undefined ? query.lowStock === 'true' : undefined
 
 	const filteredData = lowStock ? data.filter(p => p.stock <= p.minStock) : data
 
@@ -55,7 +63,7 @@ export const getProductsService = async (query: any) => {
 	}
 }
 
-export const getProductByIdService = async (id: string) => {
+export const getProductByIdService = async (id: string): Promise<Product> => {
 	const product = await getProductByIdRepo(id)
 
 	if (!product) {
@@ -65,10 +73,13 @@ export const getProductByIdService = async (id: string) => {
 	return product
 }
 
-export const updateProductService = async (id: string, data: any) => {
+export const updateProductService = async (
+	id: string,
+	data: TUpdateProduct,
+): Promise<Product> => {
 	return updateProductRepo(id, data)
 }
 
-export const deleteProductService = async (id: string) => {
+export const deleteProductService = async (id: string): Promise<Product> => {
 	return deleteProductRepo(id)
 }

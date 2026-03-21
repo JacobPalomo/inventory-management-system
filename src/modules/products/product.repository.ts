@@ -1,13 +1,15 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma'
+import { TCreateProduct, TUpdateProduct } from './product.types'
 
-export const createProductRepo = (data: any) => {
+export const createProductRepo = (data: TCreateProduct) => {
 	return prisma.product.create({ data })
 }
 
 export const getProductsRepo = async (params: {
 	skip: number
 	take: number
-	where: any
+	where: Prisma.ProductWhereInput
 }) => {
 	const { skip, take, where } = params
 
@@ -28,7 +30,7 @@ export const getProductByIdRepo = (id: string) => {
 	return prisma.product.findUnique({ where: { id } })
 }
 
-export const updateProductRepo = (id: string, data: any) => {
+export const updateProductRepo = (id: string, data: TUpdateProduct) => {
 	return prisma.product.update({
 		where: { id },
 		data,
