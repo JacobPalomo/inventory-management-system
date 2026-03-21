@@ -1,11 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma'
 
-// Mover la operación desde el servicio
-export const createMovementRepo = (data: any) => {
-	return prisma.movement.create({ data })
-}
-
 export const getMovementsRepo = async (params: {
 	skip: number
 	take: number
@@ -30,11 +25,6 @@ export const getMovementsRepo = async (params: {
 	])
 
 	return { data, total }
-}
-
-// Sin uso - eliminar
-export const getProductById = (id: string) => {
-	return prisma.product.findUnique({ where: { id } })
 }
 
 export const updateProductStock = (id: string, stock: number) => {
