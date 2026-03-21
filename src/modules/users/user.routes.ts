@@ -58,17 +58,16 @@ router.use(authMiddleware)
  *         description: Lista paginada de usuarios
  *         content:
  *           application/json:
- *             example:
- *               name: Jacob
- *               email: jacob@test.com
- *               password: "123456"
- *               role: VIEWER
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedUsers'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.get('/', authorizeRoles(Role.ADMIN, Role.EDITOR), getUsers)
 
@@ -125,8 +124,12 @@ router.get('/', authorizeRoles(Role.ADMIN, Role.EDITOR), getUsers)
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       409:
+ *         $ref: '#/components/responses/UserAlreadyExistsError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.post('/', authorizeRoles(Role.ADMIN), createUser)
 
@@ -183,6 +186,8 @@ router.post('/', authorizeRoles(Role.ADMIN), createUser)
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.put('/:id', authorizeRoles(Role.ADMIN), updateUser)
 
@@ -216,6 +221,15 @@ router.put('/:id', authorizeRoles(Role.ADMIN), updateUser)
  *     responses:
  *       200:
  *         description: Contraseña actualizada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             example:
+ *               message: Contraseña actualizada correctamente
  *       400:
  *         $ref: '#/components/responses/InvalidBodyError'
  *       401:
@@ -224,6 +238,8 @@ router.put('/:id', authorizeRoles(Role.ADMIN), updateUser)
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.patch('/me/password', updateMyPassword)
 
@@ -252,6 +268,8 @@ router.patch('/me/password', updateMyPassword)
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - newPassword
  *             properties:
  *               newPassword:
  *                 type: string
@@ -260,6 +278,15 @@ router.patch('/me/password', updateMyPassword)
  *     responses:
  *       200:
  *         description: Contraseña actualizada correctamente por el administrador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             example:
+ *               message: Contraseña actualizada correctamente el administrador
  *       400:
  *         $ref: '#/components/responses/InvalidBodyError'
  *       401:
@@ -268,6 +295,8 @@ router.patch('/me/password', updateMyPassword)
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.patch('/:id/password', authorizeRoles(Role.ADMIN), adminUpdatePassword)
 
@@ -295,16 +324,21 @@ router.patch('/:id/password', authorizeRoles(Role.ADMIN), adminUpdatePassword)
  *         description: Usuario eliminado
  *         content:
  *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *             example:
- *               message: Usuario eliminado
- *       400:
- *         $ref: '#/components/responses/InvalidBodyError'
+ *               message: Usuario eliminado correctamente
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.delete('/:id', authorizeRoles(Role.ADMIN), deleteUser)
 

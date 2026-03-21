@@ -25,13 +25,38 @@ router.use(authMiddleware)
  * /api/products:
  *   post:
  *     summary: Crear nuevo producto
+ *     description: |
+ *       Requiere autenticación JWT.
+ *
+ *       Roles permitidos:
+ *         - ADMIN
+ *         - EDITOR
  *     tags: [Products]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: [ADMIN, EDITOR]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - stock
+ *               - minStock
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Laptop HP
+ *               description:
+ *                 type: string
+ *                 example: 16GB RAM
+ *               stock:
+ *                 type: number
+ *                 example: 10
+ *               minStock:
+ *                 type: number
+ *                 example: 3
  *           example:
  *             name: Laptop HP
  *             description: 16GB RAM
@@ -44,6 +69,8 @@ router.use(authMiddleware)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Product'
+ *       400:
+ *         $ref: '#/components/responses/InvalidBodyError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
@@ -58,6 +85,8 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  * /api/products:
  *   get:
  *     summary: Obtener productos con paginación y filtros
+ *     description: |
+ *       Requiere autenticación JWT.
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
@@ -92,20 +121,14 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  *         description: Lista paginada de productos
  *         content:
  *           application/json:
- *             example:
- *               data:
- *                 - id: uuid
- *                   name: Laptop
- *                   stock: 5
- *               meta:
- *                 total: 50
- *                 page: 1
- *                 limit: 10
- *                 totalPages: 5
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedProducts'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.get('/', getProducts)
 
@@ -114,6 +137,8 @@ router.get('/', getProducts)
  * /api/products/{id}:
  *   get:
  *     summary: Obtener producto por ID
+ *     description: |
+ *       Requiere autenticación JWT.
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
@@ -136,6 +161,8 @@ router.get('/', getProducts)
  *         $ref: '#/components/responses/NotFoundError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.get('/:id', getProductById)
 
@@ -144,9 +171,15 @@ router.get('/:id', getProductById)
  * /api/products/{id}:
  *   put:
  *     summary: Actualizar producto
+ *     description: |
+ *       Requiere autenticación JWT.
+ *
+ *       Roles permitidos:
+ *         - ADMIN
+ *         - EDITOR
  *     tags: [Products]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: [ADMIN, EDITOR]
  *     parameters:
  *       - in: path
  *         name: id
@@ -155,12 +188,34 @@ router.get('/:id', getProductById)
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Laptop HP
+ *               description:
+ *                 type: string
+ *                 example: 16GB RAM
+ *               stock:
+ *                 type: number
+ *                 example: 10
+ *               minStock:
+ *                 type: number
+ *                 example: 3
  *           example:
  *             name: Laptop actualizada
- *             stock: 15
+ *             minStock: 5
+ *             isActive: true
  *     responses:
  *       200:
  *         description: Producto actualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       400:
+ *         $ref: '#/components/responses/InvalidBodyError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
@@ -169,6 +224,8 @@ router.get('/:id', getProductById)
  *         $ref: '#/components/responses/NotFoundError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
 
@@ -177,18 +234,43 @@ router.put('/:id', authorizeRoles('ADMIN', 'EDITOR'), updateProduct)
  * /api/products/{id}:
  *   delete:
  *     summary: Eliminar producto
+ *     description: |
+ *       Requiere autenticación JWT.
+ *
+ *       Roles permitidos:
+ *         - ADMIN
  *     tags: [Products]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: [ADMIN]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Producto eliminado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             example:
+ *               message: 'El producto fue eliminado correctamente'
+ *
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  *       429:
  *         $ref: '#/components/responses/ToManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.delete('/:id', authorizeRoles('ADMIN'), deleteProduct)
 
