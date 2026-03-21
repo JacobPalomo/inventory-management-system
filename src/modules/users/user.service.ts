@@ -1,29 +1,35 @@
+import { Prisma } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
 import { comparePassword, hashPassword } from '../../utils/hash'
+import { PaginatedResponse } from '../../types/pagination'
+import {
+	SafeUserResponse,
+	TAdminUpdatePassword,
+	TCreateUser,
+	TUpdatePassword,
+	TUpdateUser,
+	UserQuery,
+	UserResponse,
+} from './user.types'
 import {
 	createUserRepo,
 	findUserByEmailRepo,
-	findAdminByIdRepo,
 	findUserByIdRepo,
 	updateUserRepo,
 	getUsersRepo,
 	deleteUserRepo,
 	updatePasswordRepo,
 } from './user.repository'
-import {
-	TAdminUpdatePassword,
-	TCreateUser,
-	TUpdatePassword,
-	TUpdateUser,
-} from './user.types'
 
-export const getUsersService = async (query: any) => {
+export const getUsersService = async (
+	query: UserQuery,
+): Promise<PaginatedResponse<UserResponse>> => {
 	const page = parseInt(query.page) || 1
 	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
 
 	const search = query.search || ''
-	const where: any = {
+	const where: Prisma.UserWhereInput = {
 		name: {
 			contains: search,
 			mode: 'insensitive',
@@ -47,18 +53,12 @@ export const getUsersService = async (query: any) => {
 	}
 }
 
-export const createUserService = async (data: TCreateUser) => {
-	// Validar que la información venga con el ID del usuario administrador
-	if (!data.createdById)
-		throw new AppError('No se obtuvo el id del usuario administrador', 400)
-
-	// Validar usuario administrado que está creando al nuevo usuario
-	const admin = await findAdminByIdRepo(data.createdById)
-	if (!admin) throw new AppError('Usuario administrador inválido', 400)
-
+export const createUserService = async (
+	data: TCreateUser,
+): Promise<SafeUserResponse> => {
 	// Validar que no exista un usuario con ese mismo correo
 	const existingUser = await findUserByEmailRepo(data.email)
-	if (existingUser) throw new AppError('Usuario existente', 409)
+	if (existingUser) throw new AppError('USER_ALREADY_EXISTS')
 
 	// Cifrado de contraseña
 	const hashedPassword = await hashPassword(data.password)
@@ -73,10 +73,19 @@ export const createUserService = async (data: TCreateUser) => {
 	return safeUser
 }
 
-export const updateUserService = async (id: string, data: TUpdateUser) => {
+export const updateUserService = async (
+	id: string,
+	data: TUpdateUser,
+): Promise<SafeUserResponse> => {
 	// Validamos que el usuario exista
 	const user = await findUserByIdRepo(id)
-	if (!user) throw new AppError('El usuario no existe', 404)
+	if (!user) throw new AppError('USER_ALREADY_EXISTS')
+
+	// Si se está modificando el correo verificamos que no exista un usuario con ese correo
+	if (data.email) {
+		const existsUser = await findUserByEmailRepo(data.email)
+		if (existsUser) throw new AppError('USER_ALREADY_EXISTS')
+	}
 
 	const updatedUser = await updateUserRepo(id, data)
 
@@ -91,15 +100,15 @@ export const updatePasswordService = async (
 ) => {
 	// Validamos que el usuario exista
 	const user = await findUserByIdRepo(id)
-	if (!user) throw new AppError('El usuario no existe', 404)
+	if (!user) throw new AppError('USER_NOT_FOUND')
 
 	// Validamos que la contraseña actual se correcta
 	const isMatch = await comparePassword(data.currentPassword, user.password)
-	if (!isMatch) throw new AppError('Contraseña actual incorrecta', 400)
+	if (!isMatch) throw new AppError('USER_INVALID_CURRENT_PASSWORD')
 
 	// Validamos que la nueva contraseña no sea la misma que la actual
 	if (data.newPassword === data.currentPassword)
-		throw new AppError('La nueva contraseña debe ser diferente a la actual')
+		throw new AppError('USER_SAME_PASSWORD')
 
 	// Ciframos la nueva contraseña
 	const hashedPassword = await hashPassword(data.newPassword)
@@ -116,7 +125,7 @@ export const adminUpdatePasswordService = async (
 ) => {
 	// Validamos que el usuario exista
 	const user = await findUserByIdRepo(id)
-	if (!user) throw new AppError('El usuario no existe', 404)
+	if (!user) throw new AppError('USER_NOT_FOUND')
 
 	// Ciframos la nueva contraseña
 	const hashedPassword = await hashPassword(data.newPassword)
@@ -132,7 +141,11 @@ export const adminUpdatePasswordService = async (
 export const deleteUserService = async (id: string) => {
 	// Validamos que el usuario exista
 	const user = await findUserByIdRepo(id)
-	if (!user) throw new AppError('El usuario no existe', 404)
+	if (!user) throw new AppError('USER_NOT_FOUND')
 
-	return deleteUserRepo(id)
+	await deleteUserRepo(id)
+
+	return {
+		message: 'Usuario eliminado correctamente',
+	}
 }

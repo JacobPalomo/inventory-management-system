@@ -38,12 +38,12 @@ app.use('/api/shifts', shiftsRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
 
-// Error Management
-app.use(errorMiddleware)
-
 app.get('/', (_req, res) => {
 	res.send('API running 🚀')
 })
+
+// Error Management
+app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 3000
 

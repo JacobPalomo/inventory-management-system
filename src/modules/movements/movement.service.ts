@@ -1,8 +1,10 @@
 import { prisma } from '../../config/prisma'
-import { Prisma, MovementType } from '@prisma/client'
+import { Prisma, MovementType, Movement } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
 import { getMovementsRepo } from './movement.repository'
 import { formatFromDate, formatToDate } from '../../utils/formatDate'
+import { PaginatedResponse } from '../../types/pagination'
+import { MovementQuery } from './movement.types'
 
 export const createMovementService = async (
 	userId: string,
@@ -16,7 +18,7 @@ export const createMovementService = async (
 		})
 
 		if (!product) {
-			throw new AppError('Product not found', 404)
+			throw new AppError('PRODUCT_NOT_FOUND')
 		}
 
 		let newStock = product.stock
@@ -27,7 +29,7 @@ export const createMovementService = async (
 
 		if (type === 'OUT') {
 			if (product.stock < quantity) {
-				throw new AppError('Insufficient stock', 409)
+				throw new AppError('PRODUCT_INSUFFICIENT_STOCK')
 			}
 			newStock -= quantity
 		}
@@ -53,14 +55,16 @@ export const createMovementService = async (
 	})
 }
 
-export const getMovementsService = async (query: any) => {
+export const getMovementsService = async (
+	query: MovementQuery,
+): Promise<PaginatedResponse<Movement>> => {
 	const page = parseInt(query.page) || 1
 	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
 
 	const { search, movementType, productId, userId, from, to } = query
 
-	const where: any = {
+	const where: Prisma.MovementWhereInput = {
 		AND: [
 			// filtrar búsqueda (en relaciones)
 			search
@@ -95,8 +99,8 @@ export const getMovementsService = async (query: any) => {
 			from || to
 				? {
 						createdAt: {
-							...(from && { gte: formatFromDate(new Date(from)) }),
-							...(to && { lte: formatToDate(new Date(to)) }),
+							...(from && { gte: formatFromDate(from) }),
+							...(to && { lte: formatToDate(to) }),
 						},
 					}
 				: {},

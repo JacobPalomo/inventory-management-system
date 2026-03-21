@@ -18,11 +18,25 @@ router.use(authRateLimiter)
  * /api/auth/login:
  *   post:
  *     summary: Autenticación de usuario
+ *     description: No requiere ningún tipo de autenticación.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@test.com
+ *               password:
+ *                 type: string
+ *                 example: "123456"
  *           example:
  *             email: admin@test.com
  *             password: "123456"
@@ -34,9 +48,13 @@ router.use(authRateLimiter)
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
  *         $ref: '#/components/responses/InvalidCredentialsError'
  *       429:
- *         $ref: '#/components/responses/ToManyRequestsError'
+ *         $ref: '#/components/responses/TooManyRequestsError'
+ *       500:
+ *         $ref: '#/components/responses/UnexpectedError'
  */
 router.post('/login', login)
 

@@ -64,7 +64,7 @@ export const getShiftsService = async (
 export const createShiftService = async (data: TCreateShift) => {
 	// Validamos que el turno no solape a otro turno ya existente
 	const overlap = await findOverlappingShift(data.startTime, data.endTime)
-	if (overlap) throw new AppError('El turno se solapa con otro existente', 400)
+	if (overlap) throw new AppError('SHIFT_OVERLAP')
 
 	const shift = await createShiftRepo(data)
 	return generateShiftResponse(shift)
@@ -73,7 +73,7 @@ export const createShiftService = async (data: TCreateShift) => {
 export const updateShiftService = async (id: string, data: TUpdateShift) => {
 	// Validamos que exista el turno
 	const shift = await findShiftById(id)
-	if (!shift) throw new AppError('El turno no fue encontrado', 404)
+	if (!shift) throw new AppError('SHIFT_NOT_FOUND')
 
 	// Validamos que el turno no solape a otro turno ya existente diferente al que se está modificando
 	const overlap = await findOverlappingShift(
@@ -81,7 +81,7 @@ export const updateShiftService = async (id: string, data: TUpdateShift) => {
 		shift.endTime,
 		shift.id,
 	)
-	if (overlap) throw new AppError('El turno se solapa con otro existente', 400)
+	if (overlap) throw new AppError('SHIFT_OVERLAP')
 
 	const updatedShift = await updateShiftRepo(id, data)
 	return generateShiftResponse(updatedShift)
@@ -90,7 +90,7 @@ export const updateShiftService = async (id: string, data: TUpdateShift) => {
 export const deleteShiftService = async (id: string) => {
 	// Validamos que exista el turno
 	const shift = await findShiftById(id)
-	if (!shift) throw new AppError('El turno no fue encontrado', 404)
+	if (!shift) throw new AppError('SHIFT_NOT_FOUND')
 
 	await deleteShiftRepo(id)
 

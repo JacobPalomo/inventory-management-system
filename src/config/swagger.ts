@@ -36,20 +36,33 @@ export const swaggerSpec = swaggerJsdoc({
 				User: {
 					type: 'object',
 					properties: {
-						id: { type: 'string', example: 'uuid-user' },
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
 						name: { type: 'string', example: 'Jacob' },
 						email: { type: 'string', example: 'jacob@test.com' },
 						role: {
 							type: 'string',
 							enum: ['ADMIN', 'EDITOR', 'VIEWER'],
+							example: 'ADMIN',
 						},
-						shiftId: { type: 'string', example: 'uuid-shift' },
+						shiftId: {
+							type: 'string',
+							format: 'uuid',
+							example: '53a05a32-2f73-45e3-aed5-a6dd2883d5e6',
+						},
 						createdAt: {
 							type: 'string',
-							format: 'date-time',
+							format: 'ISODateTime',
 							example: '2026-03-19T23:57:02.901Z',
 						},
-						createdById: { type: 'string', example: 'uuid-user' },
+						createdById: {
+							type: 'string',
+							format: 'uuid',
+							example: '6c5dd545-29f9-48be-84bc-94e0752a58af',
+						},
 					},
 				},
 
@@ -57,14 +70,18 @@ export const swaggerSpec = swaggerJsdoc({
 				Shift: {
 					type: 'object',
 					properties: {
-						id: { type: 'string', example: 'uuid-shift' },
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: 'a9e660c3-f204-4662-9d43-d1a72c6a1d86',
+						},
 						name: { type: 'string', example: 'Matutino' },
-						startTime: { type: 'number', example: '08:00' }, // 480 en minutos
-						endTime: { type: 'number', example: '16:30' }, // 990 en minutos
+						startTime: { type: 'string', example: '08:00' }, // 480 en minutos
+						endTime: { type: 'string', example: '16:30' }, // 990 en minutos
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
-							format: 'date-time',
+							format: 'ISODateTime',
 							example: '2026-03-19T23:57:02.901Z',
 						},
 					},
@@ -76,7 +93,9 @@ export const swaggerSpec = swaggerJsdoc({
 					properties: {
 						token: {
 							type: 'string',
-							example: 'jwt.token.here',
+							format: 'JWTToken',
+							example:
+								'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
 						},
 						user: {
 							$ref: '#/components/schemas/User',
@@ -88,7 +107,11 @@ export const swaggerSpec = swaggerJsdoc({
 				Product: {
 					type: 'object',
 					properties: {
-						id: { type: 'string', example: 'uuid-product' },
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
 						name: { type: 'string', example: 'Laptop HP' },
 						description: { type: 'string', example: '16GB RAM' },
 						stock: { type: 'number', example: 10 },
@@ -96,7 +119,7 @@ export const swaggerSpec = swaggerJsdoc({
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
-							format: 'date-time',
+							format: 'ISODateTime',
 							example: '2025-01-01T00:00:00Z',
 						},
 					},
@@ -106,15 +129,20 @@ export const swaggerSpec = swaggerJsdoc({
 				Movement: {
 					type: 'object',
 					properties: {
-						id: { type: 'string', example: 'uuid-movement' },
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '376dda7c-4a25-446d-be54-eea3f2f9d6ce',
+						},
 						type: {
 							type: 'string',
 							enum: ['IN', 'OUT'],
+							example: 'OUT',
 						},
 						quantity: { type: 'number', example: 5 },
 						createdAt: {
 							type: 'string',
-							format: 'date-time',
+							format: 'ISODateTime',
 							example: '2025-01-01T00:00:00Z',
 						},
 						product: {
@@ -126,30 +154,139 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
-				// ❌ ERROR
-				Error: {
+				MovementType: {
+					type: 'string',
+					enum: ['IN', 'OUT'],
+				},
+
+				// 📄 PAGINACIÓN (BASE)
+				PaginatedMeta: {
 					type: 'object',
 					properties: {
+						total: { type: 'number', example: 50 },
+						page: { type: 'number', example: 1 },
+						limit: { type: 'number', example: 10 },
+						totalPages: { type: 'number', example: 5 },
+					},
+				},
+
+				PaginatedBase: {
+					type: 'object',
+					properties: {
+						meta: {
+							$ref: '#/components/schemas/PaginatedMeta',
+						},
+					},
+				},
+
+				// 👤 USERS
+				PaginatedUsers: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/User',
+									},
+								},
+							},
+						},
+						{
+							$ref: '#/components/schemas/PaginatedBase',
+						},
+					],
+				},
+
+				// 📦 PRODUCTS
+				PaginatedProducts: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Product',
+									},
+								},
+							},
+						},
+						{
+							$ref: '#/components/schemas/PaginatedBase',
+						},
+					],
+				},
+
+				// 🔄 MOVEMENTS
+				PaginatedMovements: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Movement',
+									},
+								},
+							},
+						},
+						{
+							$ref: '#/components/schemas/PaginatedBase',
+						},
+					],
+				},
+
+				// ⏱️ SHIFTS
+				PaginatedShifts: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Shift',
+									},
+								},
+							},
+						},
+						{
+							$ref: '#/components/schemas/PaginatedBase',
+						},
+					],
+				},
+
+				Error: {
+					type: 'object',
+					required: ['code', 'message'],
+					properties: {
+						code: {
+							type: 'string',
+							example: 'VALIDATION_ERROR',
+						},
 						message: {
 							type: 'string',
 							example: 'Error message',
+						},
+						details: {
+							type: 'array',
+							items: {
+								type: 'object',
+								properties: {
+									field: { type: 'string' },
+									message: { type: 'string' },
+								},
+							},
 						},
 					},
 				},
 			},
 
 			responses: {
-				UnauthorizedError: {
-					description: 'No autorizado',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
-							},
-						},
-					},
-				},
-
+				// AUTH
 				InvalidCredentialsError: {
 					description: 'Credenciales inválidas',
 					content: {
@@ -157,38 +294,24 @@ export const swaggerSpec = swaggerJsdoc({
 							schema: {
 								$ref: '#/components/schemas/Error',
 							},
-						},
-					},
-				},
-
-				InvalidBodyError: {
-					description: 'Error en el cuerpo de la solicitud',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
+							example: {
+								code: 'INVALID_CREDENTIALS',
+								message: 'Credenciales inválidas',
 							},
 						},
 					},
 				},
 
-				ToManyRequestsError: {
-					description: 'Demasiadas solicitudes',
+				UnauthorizedError: {
+					description: 'No autorizado',
 					content: {
 						'application/json': {
 							schema: {
 								$ref: '#/components/schemas/Error',
 							},
-						},
-					},
-				},
-
-				UserExistsError: {
-					description: 'Usuario existente',
-					content: {
-						'application/json': {
-							schema: {
-								$ref: '#/components/schemas/Error',
+							example: {
+								code: 'UNAUTHORIZED',
+								message: 'No autorizado',
 							},
 						},
 					},
@@ -201,16 +324,184 @@ export const swaggerSpec = swaggerJsdoc({
 							schema: {
 								$ref: '#/components/schemas/Error',
 							},
+							example: {
+								code: 'FORBIDDEN',
+								message: 'Sin permisos',
+							},
 						},
 					},
 				},
 
-				NotFoundError: {
-					description: 'Recurso no encontrado',
+				// USERS
+				UserNotFoundError: {
+					description: 'Usuario no encontrado',
 					content: {
 						'application/json': {
 							schema: {
 								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_NOT_FOUND',
+								message: 'Usuario no encontrado',
+							},
+						},
+					},
+				},
+
+				UserAlreadyExistsError: {
+					description: 'Usuario ya existe',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_ALREADY_EXISTS',
+								message: 'Usuario ya existe',
+							},
+						},
+					},
+				},
+
+				UserInvalidCurrentPasswordError: {
+					description: 'La contraseña actual es incorrecta',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_INVALID_CURRENT_PASSWORD',
+								message: 'La contraseña actual es incorrecta',
+							},
+						},
+					},
+				},
+
+				UserSamePasswordError: {
+					description: 'La nueva contraseña es igual a la contraseña actual',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'USER_SAME_PASSWORD',
+								message: 'La nueva contraseña es igual a la contraseña actual',
+							},
+						},
+					},
+				},
+
+				// PRODUCTS
+				ProductNotFoundError: {
+					description: 'Producto no encontrado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_NOT_FOUND',
+								message: 'Producto no encontrado',
+							},
+						},
+					},
+				},
+
+				ProductInsufficientStockError: {
+					description: 'Stock insuficiente',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_INSUFFICIENT_STOCK',
+								message: 'Stock insuficiente',
+							},
+						},
+					},
+				},
+
+				// SHIFTS
+				ShiftNotFoundError: {
+					description: 'Turno no encontrado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SHIFT_NOT_FOUND',
+								message: 'Turno no encontrado',
+							},
+						},
+					},
+				},
+
+				ShiftOverlapError: {
+					description: 'El turno se solapa con otro existente',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SHIFT_OVERLAP',
+								message: 'El turno se solapa con otro existente',
+							},
+						},
+					},
+				},
+
+				// GENERIC
+				ValidationError: {
+					description: 'Error de validación',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'VALIDATION_ERROR',
+								message: 'Error de validación',
+								details: [
+									{
+										field: 'nombre_del_campo',
+										message: 'Mensaje del error en ese campo',
+									},
+								],
+							},
+						},
+					},
+				},
+
+				TooManyRequestsError: {
+					description: 'Demasiadas solicitudes',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'TOO_MANY_REQUESTS',
+								message: 'Demasiadas solicitudes',
+							},
+						},
+					},
+				},
+
+				UnexpectedError: {
+					description: 'Error interno del servidor',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'INTERNAL_SERVER_ERROR',
+								message: 'Error interno del servidor',
 							},
 						},
 					},

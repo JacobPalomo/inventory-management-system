@@ -1,13 +1,10 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma'
-
-export const createMovementRepo = (data: any) => {
-	return prisma.movement.create({ data })
-}
 
 export const getMovementsRepo = async (params: {
 	skip: number
 	take: number
-	where: any
+	where: Prisma.MovementWhereInput
 }) => {
 	const { skip, take, where } = params
 
@@ -28,10 +25,6 @@ export const getMovementsRepo = async (params: {
 	])
 
 	return { data, total }
-}
-
-export const getProductById = (id: string) => {
-	return prisma.product.findUnique({ where: { id } })
 }
 
 export const updateProductStock = (id: string, stock: number) => {

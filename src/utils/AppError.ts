@@ -1,8 +1,19 @@
-export class AppError extends Error {
-	statusCode: number
+import { ERROR_CODES } from '../constants/error'
 
-	constructor(message: string, statusCode = 400) {
-		super(message)
-		this.statusCode = statusCode
+type ErrorCode = keyof typeof ERROR_CODES
+
+export class AppError extends Error {
+	public statusCode: number
+	public code: string
+	public details?: any
+
+	constructor(code: ErrorCode, details?: any) {
+		const errorConfig = ERROR_CODES[code]
+
+		super(errorConfig.message)
+
+		this.code = code
+		this.statusCode = errorConfig.statusCode
+		this.details = details
 	}
 }
