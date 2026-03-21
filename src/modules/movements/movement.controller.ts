@@ -18,7 +18,12 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
 
 		res.status(201).json(result)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -35,25 +40,39 @@ export const createExit = async (req: AuthRequest, res: Response) => {
 
 		res.status(201).json(result)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
 export const getMovements = async (req: AuthRequest, res: Response) => {
-	const { page, limit, search, movementType, productId, userId, from, to } =
-		req.query
+	try {
+		const { page, limit, search, movementType, productId, userId, from, to } =
+			req.query
 
-	const query: MovementQuery = {
-		page: page as string,
-		limit: limit as string,
-		search: search as string,
-		movementType: movementType as MovementType,
-		productId: productId as string,
-		userId: userId as string,
-		from: new Date(from as string),
-		to: new Date(to as string),
+		const query: MovementQuery = {
+			page: page as string,
+			limit: limit as string,
+			search: search as string,
+			movementType: movementType as MovementType,
+			productId: productId as string,
+			userId: userId as string,
+			from: new Date(from as string),
+			to: new Date(to as string),
+		}
+
+		const movements = await getMovementsService(query)
+		res.json(movements)
+	} catch (error: any) {
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
-
-	const movements = await getMovementsService(query)
-	res.json(movements)
 }

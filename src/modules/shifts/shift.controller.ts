@@ -27,7 +27,9 @@ export const getShifts = async (req: Request, res: Response) => {
 		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(error.statusCode).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -49,7 +51,9 @@ export const createShift = async (req: Request, res: Response) => {
 		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(error.statusCode).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -77,7 +81,9 @@ export const updateShift = async (req: Request, res: Response) => {
 		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(error.statusCode).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -93,6 +99,8 @@ export const deleteShift = async (req: Request, res: Response) => {
 		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(error.statusCode).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }

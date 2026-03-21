@@ -111,7 +111,10 @@ export const updatePasswordService = async (
 
 	// Validamos que la nueva contraseña no sea la misma que la actual
 	if (data.newPassword === data.currentPassword)
-		throw new AppError('La nueva contraseña debe ser diferente a la actual')
+		throw new AppError(
+			'La nueva contraseña debe ser diferente a la actual',
+			400,
+		)
 
 	// Ciframos la nueva contraseña
 	const hashedPassword = await hashPassword(data.newPassword)

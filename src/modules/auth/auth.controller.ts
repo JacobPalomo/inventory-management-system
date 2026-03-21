@@ -9,6 +9,11 @@ export const login = async (req: Request, res: Response) => {
 
 		res.json(result)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }

@@ -67,7 +67,7 @@ export const getProductByIdService = async (id: string): Promise<Product> => {
 	const product = await getProductByIdRepo(id)
 
 	if (!product) {
-		throw new AppError('Product not found', 404)
+		throw new AppError('Producto no encontrado', 404)
 	}
 
 	return product

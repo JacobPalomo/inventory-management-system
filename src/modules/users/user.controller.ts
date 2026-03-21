@@ -37,7 +37,11 @@ export const getUsers = async (req: Request, res: Response) => {
 		res.json(result)
 	} catch (error: any) {
 		console.log(error)
-		res.status(400).json({ error: error.message })
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -52,9 +56,12 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 		const user = await createUserService(parsedData)
 		res.status(201).json(user)
 	} catch (error: any) {
+		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(400).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -70,9 +77,12 @@ export const updateUser = async (req: Request, res: Response) => {
 		const updatedUser = await updateUserService(id, parsedData)
 		res.status(200).json(updatedUser)
 	} catch (error: any) {
+		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(400).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -87,9 +97,12 @@ export const updateMyPassword = async (req: AuthRequest, res: Response) => {
 		)
 		res.status(200).json(result)
 	} catch (error: any) {
+		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(400).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -107,9 +120,12 @@ export const adminUpdatePassword = async (req: Request, res: Response) => {
 		const result = await adminUpdatePasswordService(id, parsedData)
 		res.status(200).json(result)
 	} catch (error: any) {
+		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(400).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -122,8 +138,11 @@ export const deleteUser = async (req: Request, res: Response) => {
 		await deleteUserService(id)
 		res.json({ message: 'Usuario eliminado' })
 	} catch (error: any) {
+		console.log(error)
 		if (error.name === 'ZodError')
 			res.status(400).json({ message: JSON.parse(error.message)[0].message })
-		else res.status(400).json({ message: error.message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }

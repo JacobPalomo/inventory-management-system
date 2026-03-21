@@ -18,7 +18,7 @@ export const createMovementService = async (
 		})
 
 		if (!product) {
-			throw new AppError('Product not found', 404)
+			throw new AppError('Product no encontrado', 404)
 		}
 
 		let newStock = product.stock
@@ -29,7 +29,7 @@ export const createMovementService = async (
 
 		if (type === 'OUT') {
 			if (product.stock < quantity) {
-				throw new AppError('Insufficient stock', 409)
+				throw new AppError('Existencias insuficientes', 409)
 			}
 			newStock -= quantity
 		}

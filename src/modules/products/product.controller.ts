@@ -15,7 +15,12 @@ export const createProduct = async (req: Request, res: Response) => {
 		const product = await createProductService(validated)
 		res.status(201).json(product)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -34,7 +39,12 @@ export const getProducts = async (req: Request, res: Response) => {
 		const result = await getProductsService(query)
 		res.json(result)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -43,7 +53,12 @@ export const getProductById = async (req: Request, res: Response) => {
 		const product = await getProductByIdService(req.params.id as string)
 		res.json(product)
 	} catch (error: any) {
-		res.status(404).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -56,7 +71,12 @@ export const updateProduct = async (req: Request, res: Response) => {
 		)
 		res.json(product)
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
 
@@ -65,6 +85,11 @@ export const deleteProduct = async (req: Request, res: Response) => {
 		await deleteProductService(req.params.id as string)
 		res.json({ message: 'Product deleted' })
 	} catch (error: any) {
-		res.status(400).json({ message: error.message })
+		console.log(error)
+		if (error.name === 'ZodError')
+			res.status(400).json({ message: JSON.parse(error.message)[0].message })
+		else if (error.statusCode)
+			res.status(error.statusCode).json({ message: error.message })
+		else res.status(500).json(error)
 	}
 }
