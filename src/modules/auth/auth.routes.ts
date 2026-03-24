@@ -6,7 +6,7 @@
  */
 
 import { Router } from 'express'
-import { login } from './auth.controller'
+import { getLoginUsers, login } from './auth.controller'
 import { authRateLimiter } from '../../middlewares/rateLimit.middleware'
 
 const router = Router()
@@ -57,5 +57,7 @@ router.use(authRateLimiter)
  *         $ref: '#/components/responses/UnexpectedError'
  */
 router.post('/login', login)
+
+router.get('/users', getLoginUsers)
 
 export default router

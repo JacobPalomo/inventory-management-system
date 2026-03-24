@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken'
-import { findUserByEmail } from './auth.repository'
+import { findAllEmployeesRepo, findUserByEmail } from './auth.repository'
 import { comparePassword } from '../../utils/hash'
 import { AppError } from '../../utils/AppError'
 import { env } from '../../config/env'
+import { formatLoginUser } from './auth.utils'
+import { LoginUser } from './auth.types'
 
 export const loginService = async (email: string, password: string) => {
 	const user = await findUserByEmail(email)
@@ -31,4 +33,11 @@ export const loginService = async (email: string, password: string) => {
 		token,
 		user: safeUser,
 	}
+}
+
+export const getLoginUsersService = async () => {
+	const users: LoginUser[] = (await findAllEmployeesRepo()) as LoginUser[]
+	const formattedUsers = users.map(user => formatLoginUser(user))
+
+	return formattedUsers
 }
