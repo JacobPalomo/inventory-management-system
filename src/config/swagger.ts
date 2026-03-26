@@ -1,5 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc'
 import { env } from './env'
+import { AuditAction, EntityType } from '@prisma/client'
 
 export const swaggerSpec = swaggerJsdoc({
 	definition: {
@@ -30,6 +31,88 @@ export const swaggerSpec = swaggerJsdoc({
 				Role: {
 					type: 'string',
 					enum: ['ADMIN', 'EDITOR', 'VIEWER'],
+				},
+
+				// AUDITORÍA
+				AuditAction: {
+					type: 'string',
+					enum: ['CREATE', 'UPDATE', 'DELETE', 'STOCK_ADJUST', 'PRICE_CHANGE'],
+					example: 'UPDATE',
+				},
+				EntityType: {
+					type: 'string',
+					enum: [
+						'Auth',
+						'Movement',
+						'Product',
+						'Shift',
+						'User',
+						'CashSession',
+						'CashRegister',
+					],
+					example: 'User',
+				},
+				AuditLog: {
+					type: 'object',
+					required: [
+						'id',
+						'userId',
+						'user',
+						'action',
+						'entityId',
+						'entity',
+						'createdAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: 'cd872b4e-0a10-499b-bb63-d177f91f65c7',
+						},
+						action: {
+							$ref: '#/components/schemas/AuditAction',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: 'a2474e24-8a76-4c9a-96f4-c3c1eaa77f96',
+						},
+						user: {
+							type: 'object',
+							required: ['name'],
+							properties: {
+								name: {
+									type: 'string',
+									example: 'Jacob',
+								},
+							},
+						},
+						entityId: {
+							type: 'string',
+							format: 'uuid',
+							example: '3fb8bed4-38d4-415a-b949-f9591d41770b',
+						},
+						entity: {
+							$ref: '#/components/schemas/EntityType',
+						},
+						oldValue: {
+							type: 'object',
+							nullable: true,
+							additionalProperties: true,
+							description: 'Valor antes del cambio (JSON dinámico)',
+						},
+						newValue: {
+							type: 'object',
+							nullable: true,
+							additionalProperties: true,
+							description: 'Valor antes del cambio (JSON dinámico)',
+						},
+						createdAt: {
+							type: 'string',
+							format: 'ISODate',
+							example: '2026-03-26T18:25:43.511Z',
+						},
+					},
 				},
 
 				// 🔐 USER
@@ -177,6 +260,24 @@ export const swaggerSpec = swaggerJsdoc({
 							$ref: '#/components/schemas/PaginatedMeta',
 						},
 					},
+				},
+
+				// AUDITORÍA
+				PaginatedAuditLogs: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/AuditLog',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
 				},
 
 				// 👤 USERS
