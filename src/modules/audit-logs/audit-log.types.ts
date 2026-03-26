@@ -1,6 +1,4 @@
 import { AuditAction, EntityType, Prisma } from '@prisma/client'
-import z from 'zod'
-import { PaginationQuery, TZodPaginationQuery } from '../../types/pagination'
 export interface TAuditLog {
 	id: string
 	userId: string
@@ -38,32 +36,4 @@ export const auditLogSelect: Prisma.AuditLogSelect = {
 	oldValue: true,
 	newValue: true,
 	createdAt: true,
-}
-
-export interface TAuditLogsByEntityParams {
-	entity: EntityType
-	entityId: string
-}
-
-export interface TZodAuditLogsByEntityParams {
-	entity: z.ZodEnum
-	entityId: z.ZodUUID
-}
-
-export interface TAuditLogQuery extends PaginationQuery {
-	entity?: EntityType
-	entityId?: string
-	userId?: string
-	dateFrom?: Date
-	dateTo?: Date
-	action?: AuditAction
-}
-
-export interface TZodAuditLogQuery extends TZodPaginationQuery {
-	entityId?: z.ZodOptional<z.ZodUUID>
-	entity?: z.ZodOptional<z.ZodEnum>
-	userId?: z.ZodOptional<z.ZodUUID>
-	dateFrom?: z.ZodOptional<z.ZodCoercedDate<string>>
-	dateTo?: z.ZodOptional<z.ZodCoercedDate<string>>
-	action?: z.ZodOptional<z.ZodEnum>
 }
