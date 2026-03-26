@@ -1,3 +1,5 @@
+import z from 'zod'
+
 interface MetaPaginatedResponse {
 	total: number
 	page: number
@@ -11,6 +13,11 @@ export interface PaginatedResponse<T> {
 }
 
 export interface PaginationQuery {
-	page: string
-	limit: string
+	page: number
+	limit: number
+}
+
+export interface TZodPaginationQuery {
+	page: z.ZodNumber
+	limit: z.ZodNumber
 }
