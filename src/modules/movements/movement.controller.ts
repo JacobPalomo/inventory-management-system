@@ -1,9 +1,7 @@
 import { NextFunction, Response } from 'express'
-import { MovementType } from '@prisma/client'
 import { AuthRequest } from '../../middlewares/auth.middleware'
 import { createMovementService, getMovementsService } from './movement.service'
-import { movementSchema } from './movement.schema'
-import { MovementQuery } from './movement.types'
+import { movementQuerySchema, movementSchema } from './movement.schema'
 
 export const createEntry = async (
 	req: AuthRequest,
@@ -53,19 +51,7 @@ export const getMovements = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search, movementType, productId, userId, from, to } =
-			req.query
-
-		const query: MovementQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-			movementType: movementType as MovementType,
-			productId: productId as string,
-			userId: userId as string,
-			from: new Date(from as string),
-			to: new Date(to as string),
-		}
+		const query = movementQuerySchema.parse(req.query)
 
 		const movements = await getMovementsService(query)
 		res.json(movements)

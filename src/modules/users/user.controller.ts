@@ -4,6 +4,7 @@ import {
 	createUserSchema,
 	updatePasswordSchema,
 	updateUserSchema,
+	usersQuerySchema,
 } from './user.schema'
 import {
 	adminUpdatePasswordService,
@@ -18,7 +19,6 @@ import {
 	TCreateUser,
 	TUpdatePassword,
 	TUpdateUser,
-	UserQuery,
 } from './user.types'
 import { AuthRequest } from '../../middlewares/auth.middleware'
 
@@ -28,13 +28,7 @@ export const getUsers = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search } = req.query
-
-		const query: UserQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-		}
+		const query = usersQuerySchema.parse(req.query)
 
 		const result = await getUsersService(query)
 		res.json(result)
