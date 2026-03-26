@@ -20,7 +20,9 @@ model User {
 
     movements Movement[]
 
-    createdAt DateTime @default(now())
+    // Auditoría
+    auditLogs AuditLog[]
+    createdAt DateTime   @default(now())
 
     createdById  String?
     createdBy    User?   @relation("UserCreatedBy", fields: [createdById], references: [id])
@@ -87,4 +89,55 @@ enum Role {
 enum MovementType {
     IN
     OUT
+}
+
+enum AuditAction {
+    CREATE
+    UPDATE
+    DELETE
+    STOCK_ADJUST
+    PRICE_CHANGE
+}
+
+enum EntityType {
+    Auth
+    Movement
+    Product
+    Shift
+    User
+    CashSession
+    CashRegister
+}
+
+//////////////////////////////////////////////////////
+// AUDIT LOG
+//////////////////////////////////////////////////////
+
+model AuditLog {
+    id String @id @default(uuid())
+
+    // Usuario que ejecutó la acción
+    userId String
+
+    // Tipo de acción
+    action AuditAction
+
+    // ID del registro afectado
+    entityId String
+
+    // Entidad afectada
+    // Ej: "Product", "Sale", "Customer"
+    entity EntityType
+
+    // Valor antes del cambio
+    oldValue Json?
+
+    // Valor después del cambio
+    newValue Json?
+
+    // Fecha del evento
+    createdAt DateTime @default(now())
+
+    // Relación
+    user User @relation(fields: [userId], references: [id])
 }
