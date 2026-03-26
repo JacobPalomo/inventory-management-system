@@ -3,7 +3,7 @@ import {
 	auditLogQuerySchema,
 	auditLogsByEntityParamsSchema,
 } from './audit-log.schema'
-import { validatePaginateQuerySchema } from '../../schemas/pagination.schema'
+import { validatePaginateQuerySchema } from '../../validations/pagination.schema'
 import { getAuditLogsService } from './audit-log.service'
 import { TAuditLogQuery, TAuditLogsByEntityParams } from './audit-log.types'
 
