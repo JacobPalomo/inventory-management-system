@@ -1,12 +1,13 @@
 import { Prisma } from '@prisma/client'
 import { getAuditLogsRepo } from './audit-log.repository'
-import { TAuditLog, TAuditLogQuery } from './audit-log.types'
-import { PaginatedResponse } from '../../types/pagination'
+import { TAuditLog } from './audit-log.types'
+import { PaginationResponse } from '../../types/pagination'
 import { formatToDate } from '../../utils/formatDate'
+import { TAuditLogsQuery } from './audit-log.schema'
 
 export const getAuditLogsService = async (
-	query: TAuditLogQuery,
-): Promise<PaginatedResponse<TAuditLog>> => {
+	query: TAuditLogsQuery,
+): Promise<PaginationResponse<TAuditLog>> => {
 	const { page, limit, entityId, entity, userId, dateFrom, dateTo, action } =
 		query
 
