@@ -7,6 +7,25 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
+
+enum SaleStatus {
+    OPEN
+    PAID
+    CANCELLED
+    REFUNDED
+    HOLD
+    QUOTE
+}
+
+enum SaleItemStatus {
+    ACTIVE
+    CANCELLED
+    REFUNDED
+}
+
 model User {
     id       String @id @default(uuid())
     name     String
@@ -27,6 +46,15 @@ model User {
     createdById  String?
     createdBy    User?   @relation("UserCreatedBy", fields: [createdById], references: [id])
     usersCreated User[]  @relation("UserCreatedBy")
+
+    // Relaciones POS
+    sales Sale[]
+
+    // Cancelaciones
+    voidedSales        Sale[]     @relation("SaleVoidedBy")
+    voidedSaleItems    SaleItem[] @relation("SaleItemVoidedBy")
+    cancelledSaleItems SaleItem[] @relation("SaleItemCancelledBy")
+    cancelledSales     Sale[]     @relation("SaleCancelledBy")
 }
 
 model Shift {
@@ -72,6 +100,80 @@ model CashRegister {
     createdAt DateTime @default(now())
 }
 
+//////////////////////////////////////////////////////
+// SALES
+//////////////////////////////////////////////////////
+
+model Sale {
+    id String @id @default(uuid())
+
+    sessionId  String?
+    userId     String
+    customerId String?
+
+    status SaleStatus @default(OPEN)
+
+    subtotal Float
+    tax      Float
+    discount Float @default(0)
+    total    Float
+
+    notes String?
+
+    isVoided Boolean @default(false)
+
+    voidedAt   DateTime?
+    voidedById String?
+    voidedBy   User?     @relation("SaleVoidedBy", fields: [voidedById], references: [id])
+
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    cancelledAt DateTime?
+
+    cancelledById String?
+    cancelledBy   User?   @relation("SaleCancelledBy", fields: [cancelledById], references: [id])
+
+    user User @relation(fields: [userId], references: [id])
+
+    items SaleItem[]
+}
+
+model SaleItem {
+    id String @id @default(uuid())
+
+    saleId    String
+    productId String
+
+    quantity Float
+    price    Float
+    cost     Float?
+
+    discount Float @default(0)
+
+    subtotal Float
+    tax      Float
+    total    Float
+
+    status SaleItemStatus @default(ACTIVE)
+
+    // Cancelación parcial
+    isVoided Boolean @default(false)
+
+    voidedAt DateTime?
+
+    voidedById String?
+    voidedBy   User?   @relation("SaleItemVoidedBy", fields: [voidedById], references: [id])
+
+    cancelledAt   DateTime?
+    cancelledById String?
+    cancelledBy   User?     @relation("SaleItemCancelledBy", fields: [cancelledById], references: [id])
+
+    cancelReason String?
+
+    sale    Sale    @relation(fields: [saleId], references: [id])
+    product Product @relation(fields: [productId], references: [id])
+}
+
 model Product {
     id          String     @id @default(uuid())
     name        String
@@ -81,6 +183,8 @@ model Product {
     isActive    Boolean    @default(true)
     createdAt   DateTime   @default(now())
     movements   Movement[]
+
+    saleItems SaleItem[]
 }
 
 model Movement {
