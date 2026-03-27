@@ -85,37 +85,59 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  * /api/products:
  *   get:
  *     summary: Obtener productos con paginación y filtros
+ *
  *     description: |
- *       Requiere autenticación JWT.
+ *       Retorna una lista de productos con paginación y filtros.
+ *
+ *       - Requiere autenticación JWT.
+ *       - No es necesario un rol en específico.
+ *
  *     tags: [Products]
+ *
  *     security:
  *       - bearerAuth: []
+ *
  *     parameters:
  *       - in: query
  *         name: page
+ *         description: Número de página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
  *         example: 1
+ *
  *       - in: query
  *         name: limit
+ *         description: Cantidad de registros por página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *         example: 10
+ *
  *       - in: query
  *         name: search
+ *         description: Permite filtrar por nombre de producto
  *         schema:
  *           type: string
  *         example: laptop
+ *
  *       - in: query
  *         name: lowStock
+ *         description: Permite filtrar por productos con stock por debajo del mínimo
  *         schema:
  *           type: boolean
  *         example: true
+ *
  *       - in: query
  *         name: isActive
+ *         description: Permite filtrar por estado del producto (activo o inactivo)
  *         schema:
  *           type: boolean
  *         example: true
+ *
  *     responses:
  *       200:
  *         description: Lista paginada de productos
@@ -123,10 +145,16 @@ router.post('/', authorizeRoles('ADMIN', 'EDITOR'), createProduct)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaginatedProducts'
+ *
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
+ *
  *       429:
  *         $ref: '#/components/responses/TooManyRequestsError'
+ *
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

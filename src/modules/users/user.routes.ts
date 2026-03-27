@@ -28,31 +28,48 @@ router.use(authMiddleware)
  * /api/users:
  *   get:
  *     summary: Obtener usuarios con paginación y filtros
+ *
  *     description: |
- *       Requiere autenticación JWT.
+ *       Retorna una lista de usuarios con paginación y filtros.
+ *
+ *       - Requiere autenticación JWT.
  *
  *       Roles permitidos:
  *         - ADMIN
  *         - EDITOR
+ *
  *     tags: [Users]
+ *
  *     security:
  *       - bearerAuth: [ADMIN, EDITOR]
+ *
  *     parameters:
  *       - in: query
  *         name: page
+ *         description: Número de página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
  *         example: 1
+ *
  *       - in: query
  *         name: limit
+ *         description: Cantidad de registros por página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *         example: 10
+ *
  *       - in: query
  *         name: search
+ *         description: Permite filtrar por el nombre. No distingue entre mayúsculas ni minúsculas
  *         schema:
  *           type: string
  *         example: JAcOb
+ *
  *     responses:
  *       200:
  *         description: Lista paginada de usuarios
@@ -60,12 +77,16 @@ router.use(authMiddleware)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaginatedUsers'
+ *
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
+ *
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
+ *
  *       429:
  *         $ref: '#/components/responses/TooManyRequestsError'
+ *
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

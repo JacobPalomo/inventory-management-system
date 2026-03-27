@@ -1,11 +1,4 @@
 import z from 'zod'
-import { PaginationQuery } from '../../types/pagination'
-
-export interface ProductQuery extends PaginationQuery {
-	search?: string
-	isActive?: string
-	lowStock?: string
-}
 
 export interface TZodCreateProduct {
 	name: z.ZodString

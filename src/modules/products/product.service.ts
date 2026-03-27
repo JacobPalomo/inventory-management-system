@@ -1,7 +1,7 @@
 import { Product } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
-import { PaginatedResponse } from '../../types/pagination'
-import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
+import { PaginationResponse } from '../../types/pagination'
+import { TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductRepo,
 	getProductsRepo,
@@ -9,6 +9,7 @@ import {
 	updateProductRepo,
 	deleteProductRepo,
 } from './product.repository'
+import { TProductsQuery } from './product.schema'
 
 export const createProductService = async (
 	data: TCreateProduct,
@@ -17,15 +18,10 @@ export const createProductService = async (
 }
 
 export const getProductsService = async (
-	query: ProductQuery,
-): Promise<PaginatedResponse<Product>> => {
-	const page = parseInt(query.page) || 1
-	const limit = parseInt(query.limit) || 10
+	query: TProductsQuery,
+): Promise<PaginationResponse<Product>> => {
+	const { page, limit, search, isActive, lowStock } = query
 	const skip = (page - 1) * limit
-
-	const search = query.search || ''
-	const isActive =
-		query.isActive !== undefined ? query.isActive === 'true' : undefined
 
 	const where: any = {
 		AND: [
@@ -46,9 +42,6 @@ export const getProductsService = async (
 		take: limit,
 		where,
 	})
-
-	const lowStock =
-		query.lowStock !== undefined ? query.lowStock === 'true' : undefined
 
 	const filteredData = lowStock ? data.filter(p => p.stock <= p.minStock) : data
 

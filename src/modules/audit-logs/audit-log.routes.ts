@@ -41,9 +41,8 @@ router.use(authMiddleware)
  *         schema:
  *           type: integer
  *           minimum: 1
- *           maximum: 100
- *           default: 10
- *         example: 10
+ *           default: 1
+ *         example: 1
  *
  *       - in: query
  *         name: limit

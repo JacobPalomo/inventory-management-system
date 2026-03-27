@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import {
-	auditLogQuerySchema,
 	auditLogsByEntityParamsSchema,
+	auditLogsByEntityQuerySchema,
+	auditLogsQuerySchema,
 } from './audit-log.schema'
-import { validatePaginateQuerySchema } from '../../validations/pagination.schema'
 import { getAuditLogsService } from './audit-log.service'
-import { TAuditLogQuery, TAuditLogsByEntityParams } from './audit-log.types'
 
 export const getAuditLogs = async (
 	req: Request,
@@ -13,16 +12,9 @@ export const getAuditLogs = async (
 	next: NextFunction,
 ) => {
 	try {
-		const page = parseInt(req.query.page as string) || 1
-		const limit = parseInt(req.query.limit as string) || 10
+		const query = auditLogsQuerySchema.parse(req.query)
 
-		const parsedQuery = auditLogQuerySchema.parse({
-			...req.query,
-			page,
-			limit,
-		}) as TAuditLogQuery
-
-		const auditLogs = await getAuditLogsService(parsedQuery)
+		const auditLogs = await getAuditLogsService(query)
 		res.status(200).json(auditLogs)
 	} catch (error) {
 		next(error)
@@ -35,23 +27,12 @@ export const getAuditLogsByEntity = async (
 	next: NextFunction,
 ) => {
 	try {
-		const page = parseInt(req.query.page as string) || 1
-		const limit = parseInt(req.query.limit as string) || 10
-
-		const { entity, entityId } = auditLogsByEntityParamsSchema.parse(
-			req.params,
-		) as TAuditLogsByEntityParams
-
-		const parsePaginateQuery = validatePaginateQuerySchema.parse({
-			page,
-			limit,
-		})
+		const params = auditLogsByEntityParamsSchema.parse(req.params)
+		const query = auditLogsByEntityQuerySchema.parse(req.query)
 
 		const entityAuditLogs = await getAuditLogsService({
-			page: parsePaginateQuery.page,
-			limit: parsePaginateQuery.limit,
-			entity,
-			entityId,
+			...query,
+			...params,
 		})
 
 		res.status(200).json(entityAuditLogs)

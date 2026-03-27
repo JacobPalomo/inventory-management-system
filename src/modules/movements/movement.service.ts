@@ -1,10 +1,11 @@
 import { prisma } from '../../config/prisma'
-import { Prisma, MovementType, Movement } from '@prisma/client'
+import { Prisma, MovementType } from '@prisma/client'
 import { AppError } from '../../utils/AppError'
 import { getMovementsRepo } from './movement.repository'
 import { formatFromDate, formatToDate } from '../../utils/formatDate'
-import { PaginatedResponse } from '../../types/pagination'
-import { MovementQuery } from './movement.types'
+import { PaginationResponse } from '../../types/pagination'
+import { TMovement } from './movement.types'
+import { TMovementQuery } from './movement.schema'
 
 export const createMovementService = async (
 	userId: string,
@@ -56,13 +57,19 @@ export const createMovementService = async (
 }
 
 export const getMovementsService = async (
-	query: MovementQuery,
-): Promise<PaginatedResponse<Movement>> => {
-	const page = parseInt(query.page) || 1
-	const limit = parseInt(query.limit) || 10
+	query: TMovementQuery,
+): Promise<PaginationResponse<TMovement>> => {
+	const {
+		page,
+		limit,
+		search,
+		movementType,
+		productId,
+		userId,
+		dateFrom,
+		dateTo,
+	} = query
 	const skip = (page - 1) * limit
-
-	const { search, movementType, productId, userId, from, to } = query
 
 	const where: Prisma.MovementWhereInput = {
 		AND: [
@@ -96,11 +103,11 @@ export const getMovementsService = async (
 			userId ? { userId } : {},
 
 			// filtrar por rango de fechas
-			from || to
+			dateFrom && dateTo
 				? {
 						createdAt: {
-							...(from && { gte: formatFromDate(from) }),
-							...(to && { lte: formatToDate(to) }),
+							...(dateFrom && { gte: formatFromDate(dateFrom) }),
+							...(dateTo && { lte: formatToDate(dateTo) }),
 						},
 					}
 				: {},

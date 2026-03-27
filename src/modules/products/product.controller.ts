@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
+import { TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductService,
 	getProductsService,
@@ -7,7 +7,11 @@ import {
 	updateProductService,
 	deleteProductService,
 } from './product.service'
-import { createProductSchema, updateProductSchema } from './product.schema'
+import {
+	createProductSchema,
+	productsQuerySchema,
+	updateProductSchema,
+} from './product.schema'
 
 export const createProduct = async (
 	req: Request,
@@ -29,15 +33,7 @@ export const getProducts = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search, isActive, lowStock } = req.query
-
-		const query: ProductQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-			isActive: isActive as string,
-			lowStock: lowStock as string,
-		}
+		const query = productsQuerySchema.parse(req.query)
 
 		const result = await getProductsService(query)
 		res.json(result)

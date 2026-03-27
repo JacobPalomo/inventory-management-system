@@ -241,53 +241,75 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *   get:
  *     summary: Obtener historial de movimientos
  *     description: |
- *       Requiere autenticación JWT.
+ *       Permite obtener el historial de movimientos con paginación y filtros.
+ *       - Requiere autenticación JWT.
+ *       - No requiere un rol en específico.
  *     tags: [Movements]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *
  *       - in: query
  *         name: page
+ *         description: Número de página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
  *         example: 1
+ *
  *       - in: query
  *         name: limit
+ *         description: Cantidad de registros por página (mayor que 0)
  *         schema:
- *           type: number
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
  *         example: 10
+ *
  *       - in: query
  *         name: productId
+ *         description: ID del producto al cual se le aplicó un movimiento
  *         schema:
  *           type: string
- *         example: "123"
+ *         format: uuid
+ *         example: "10c83881-de58-4659-a817-18756a245f36"
+ *
  *       - in: query
  *         name: search
+ *         description: Permite buscar por nombre de producto
  *         schema:
  *           type: string
  *         example: laptop
+ *
  *       - in: query
  *         name: movementType
+ *         description: Tipo de movimiento realizado
  *         schema:
  *           type: string
  *           enum: [IN, OUT]
  *         required: false
- *         description: Tipo de movimiento (IN = entrada, OUT = salida)
  *         example: IN
+ *
  *       - in: query
- *         name: from
+ *         name: dateFrom
+ *         description: |
+ *           (YYYY-MM-DD) Fecha inicial del rango para filtrado por rango de fechas
  *         schema:
  *           type: string
- *           format: date
- *         description: Fecha inicial en formato YYYY-MM-DD (zona horaria local)
+ *           format: date-time
  *         example: "2026-03-18"
+ *
  *       - in: query
- *         name: to
+ *         name: dateTo
+ *         description: |
+ *           (YYYY-MM-DD) Fecha final del rango para filtrado por rango de fechas
  *         schema:
  *           type: string
- *           format: date
- *         description: Fecha final en formato YYYY-MM-DD (zona horaria local)
+ *           format: date-time
  *         example: "2026-03-19"
+ *
  *     responses:
  *       200:
  *         description: Lista de movimientos
@@ -295,10 +317,16 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *           application/json:
  *             schema:
  *                $ref: '#/components/schemas/PaginatedMovements'
+ *
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
+ *
  *       429:
  *         $ref: '#/components/responses/TooManyRequestsError'
+ *
  *       500:
  *         $ref: '#/components/responses/UnexpectedError'
  */

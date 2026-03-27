@@ -1,5 +1,15 @@
 import z from 'zod'
 import { TZodCreateShift, TZodUpdateShift } from './shift.types'
+import { withPagination } from '../../validations/pagination.schema'
+
+const shiftsFilterSchema = z.object({
+	search: z.string().optional(),
+	isActive: z.coerce.boolean('No es un valor boleano válido').optional(),
+})
+
+export const shiftsQuerySchema = withPagination(shiftsFilterSchema)
+
+export type TShiftsQuery = z.infer<typeof shiftsQuerySchema>
 
 export const createShiftSchema = z.object<TZodCreateShift>({
 	name: z
