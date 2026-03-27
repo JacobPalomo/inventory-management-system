@@ -58,7 +58,28 @@ export const ERROR_CODES = {
 		message: 'El turno se solapa con otro existente',
 	},
 
+	// CASH_REGISTERS
+	CASH_REGISTER_NOT_FOUND: {
+		statusCode: 400,
+		message: 'Caja registradora no encontrada ',
+	},
+
+	CASH_REGISTER_ALREADY_EXISTS: {
+		statusCode: 409,
+		message: 'Caja registradora ya existe con ese nombre',
+	},
+
+	CASH_REGISTER_IS_NOT_ACTIVE: {
+		statusCode: 409,
+		message: 'La caja registradora no se encuentra activa',
+	},
+
 	// GENERIC
+	NO_BODY_ERROR: {
+		statusCode: 400,
+		message: 'Falta cuerpo de la solicitud',
+	},
+
 	INTERNAL_SERVER_ERROR: {
 		statusCode: 500,
 		message: 'Error interno del servidor',
