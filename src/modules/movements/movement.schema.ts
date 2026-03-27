@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { MovementType } from '@prisma/client'
-import { withPagination } from '../../validations/pagination.schema'
+import { withPagination } from '../../shared/schemas/pagination.schema'
 
 const movementFilterSchema = z.object({
 	search: z.string().optional(),

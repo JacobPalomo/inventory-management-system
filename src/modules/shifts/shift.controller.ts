@@ -11,7 +11,7 @@ import {
 	shiftsQuerySchema,
 	updateShiftSchema,
 } from './shift.schema'
-import { timeToMinutes } from '../../utils/time'
+import { timeToMinutes } from '../../shared/utils/time'
 
 export const getShifts = async (
 	req: Request,

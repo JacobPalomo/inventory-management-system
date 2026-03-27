@@ -1,6 +1,6 @@
 import { Product } from '@prisma/client'
-import { AppError } from '../../utils/AppError'
-import { PaginationResponse } from '../../types/pagination'
+import { AppError } from '../../shared/utils/AppError'
+import { PaginationResponse } from '../../shared/types/pagination'
 import { TCreateProduct, TUpdateProduct } from './product.types'
 import {
 	createProductRepo,

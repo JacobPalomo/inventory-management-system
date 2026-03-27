@@ -1,5 +1,5 @@
 import { Shift } from '@prisma/client'
-import { minutesToTime } from '../../utils/time'
+import { minutesToTime } from '../../shared/utils/time'
 
 export const generateShiftResponse = (shift: Shift) => {
 	const { startTime, endTime, ...safeShift } = shift

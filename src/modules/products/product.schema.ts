@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { TZodCreateProduct, TZodUpdateProduct } from './product.types'
-import { withPagination } from '../../validations/pagination.schema'
+import { withPagination } from '../../shared/schemas/pagination.schema'
 
 export const createProductSchema = z.object<TZodCreateProduct>({
 	name: z.string().min(3),

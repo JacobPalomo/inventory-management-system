@@ -1,9 +1,9 @@
 import { prisma } from '../../config/prisma'
 import { Prisma, MovementType } from '@prisma/client'
-import { AppError } from '../../utils/AppError'
+import { AppError } from '../../shared/utils/AppError'
 import { getMovementsRepo } from './movement.repository'
-import { formatFromDate, formatToDate } from '../../utils/formatDate'
-import { PaginationResponse } from '../../types/pagination'
+import { formatFromDate, formatToDate } from '../../shared/utils/formatDate'
+import { PaginationResponse } from '../../shared/types/pagination'
 import { TMovement } from './movement.types'
 import { TMovementQuery } from './movement.schema'
 

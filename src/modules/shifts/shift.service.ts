@@ -8,10 +8,10 @@ import {
 	getShiftsRepo,
 	updateShiftRepo,
 } from './shift.repository'
-import { AppError } from '../../utils/AppError'
+import { AppError } from '../../shared/utils/AppError'
 import { generateShiftResponse } from './shift.utils'
 import { TShiftsQuery } from './shift.schema'
-import { PaginationResponse } from '../../types/pagination'
+import { PaginationResponse } from '../../shared/types/pagination'
 
 export const getShiftsService = async (
 	query: TShiftsQuery,
