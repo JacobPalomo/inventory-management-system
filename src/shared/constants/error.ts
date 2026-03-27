@@ -42,6 +42,16 @@ export const ERROR_CODES = {
 		message: 'Producto no encontrado',
 	},
 
+	PRODUCT_ALREADY_EXISTS: {
+		statusCode: 409,
+		message: 'Ya existe un producto con ese identificador',
+	},
+
+	PRODUCT_ALREADY_DELETED: {
+		statusCode: 409,
+		message: 'El producto ya se encuentra eliminado',
+	},
+
 	PRODUCT_INSUFFICIENT_STOCK: {
 		statusCode: 409,
 		message: 'Stock insuficiente',
@@ -75,6 +85,11 @@ export const ERROR_CODES = {
 	},
 
 	// GENERIC
+	INVALID_QUERY_PARAMS: {
+		statusCode: 400,
+		message: 'Parámetros de consulta inválidos',
+	},
+
 	NO_BODY_ERROR: {
 		statusCode: 400,
 		message: 'Falta cuerpo de la solicitud',
