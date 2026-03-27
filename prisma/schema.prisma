@@ -175,14 +175,34 @@ model SaleItem {
 }
 
 model Product {
-    id          String     @id @default(uuid())
+    id String @id @default(uuid())
+
+    barcode String?
+    sku     String?
+
     name        String
     description String?
-    stock       Int        @default(0)
-    minStock    Int        @default(0)
-    isActive    Boolean    @default(true)
-    createdAt   DateTime   @default(now())
-    movements   Movement[]
+
+    price   Float
+    cost    Float?
+    avgCost Float?
+
+    stock         Float  @default(0)
+    reservedStock Float  @default(0)
+    minStock      Float  @default(0)
+    maxStock      Float?
+
+    taxRate Float @default(0)
+
+    trackStock    Boolean @default(true)
+    allowNegative Boolean @default(false)
+
+    isActive Boolean @default(true)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    movements Movement[]
 
     saleItems SaleItem[]
 }
