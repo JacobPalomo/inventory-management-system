@@ -163,7 +163,6 @@ router.get('/audit', authorizeRoles(Role.ADMIN), getAuditLogs)
  *         schema:
  *           type: integer
  *           minimum: 1
- *           maximum: 100
  *           default: 1
  *         example: 1
  *
