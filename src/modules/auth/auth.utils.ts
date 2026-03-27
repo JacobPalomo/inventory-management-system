@@ -1,4 +1,4 @@
-import { minutesToTime } from '../../utils/time'
+import { minutesToTime } from '../../shared/utils/time'
 import { LoginUser } from './auth.types'
 
 export const formatLoginUser = (user: LoginUser) => {

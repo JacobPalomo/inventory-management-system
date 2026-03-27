@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
 import { getAuditLogsRepo } from './audit-log.repository'
 import { TAuditLog } from './audit-log.types'
-import { PaginationResponse } from '../../types/pagination'
-import { formatToDate } from '../../utils/formatDate'
+import { PaginationResponse } from '../../shared/types/pagination'
+import { formatToDate } from '../../shared/utils/formatDate'
 import { TAuditLogsQuery } from './audit-log.schema'
 
 export const getAuditLogsService = async (

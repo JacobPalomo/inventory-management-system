@@ -6,7 +6,7 @@ import {
 	TZodUpdateUser,
 } from './user.types'
 import { Role } from '@prisma/client'
-import { withPagination } from '../../validations/pagination.schema'
+import { withPagination } from '../../shared/schemas/pagination.schema'
 
 const usersFilterSchema = z.object({
 	search: z.string().optional(),

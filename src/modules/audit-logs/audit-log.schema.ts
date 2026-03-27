@@ -3,7 +3,7 @@ import { AuditAction, EntityType } from '@prisma/client'
 import {
 	paginationSchema,
 	withPagination,
-} from '../../validations/pagination.schema'
+} from '../../shared/schemas/pagination.schema'
 
 const auditLogsFilterSchema = z.object({
 	entityId: z.uuid('No es un ID válido').optional(),

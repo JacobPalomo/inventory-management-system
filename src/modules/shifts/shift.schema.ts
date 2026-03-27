@@ -1,6 +1,6 @@
 import z from 'zod'
 import { TZodCreateShift, TZodUpdateShift } from './shift.types'
-import { withPagination } from '../../validations/pagination.schema'
+import { withPagination } from '../../shared/schemas/pagination.schema'
 
 const shiftsFilterSchema = z.object({
 	search: z.string().optional(),

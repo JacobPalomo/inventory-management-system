@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
-import { AppError } from '../../utils/AppError'
-import { comparePassword, hashPassword } from '../../utils/hash'
-import { PaginationResponse } from '../../types/pagination'
+import { AppError } from '../../shared/utils/AppError'
+import { comparePassword, hashPassword } from '../../shared/utils/hash'
+import { PaginationResponse } from '../../shared/types/pagination'
 import {
 	SafeUserResponse,
 	TAdminUpdatePassword,
