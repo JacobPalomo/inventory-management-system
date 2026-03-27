@@ -104,7 +104,7 @@ export const swaggerSpec = swaggerJsdoc({
 							type: 'object',
 							nullable: true,
 							additionalProperties: true,
-							description: 'Valor antes del cambio (JSON dinámico)',
+							description: 'Valor después del cambio (JSON dinámico)',
 						},
 						createdAt: {
 							type: 'string',
@@ -186,21 +186,100 @@ export const swaggerSpec = swaggerJsdoc({
 				// 📦 PRODUCT
 				Product: {
 					type: 'object',
+					required: ['id', 'name', 'price', 'stock', 'minStock', 'isActive'],
 					properties: {
 						id: {
 							type: 'string',
 							format: 'uuid',
 							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
 						},
-						name: { type: 'string', example: 'Laptop HP' },
-						description: { type: 'string', example: '16GB RAM' },
-						stock: { type: 'integer', example: 10 },
-						minStock: { type: 'integer', example: 3 },
-						isActive: { type: 'boolean', example: true },
-						createdAt: {
+						barcode: {
 							type: 'string',
-							format: 'date-time',
-							example: '2026-01-01T00:00:00Z',
+							example: '7501234567890',
+							nullable: true,
+						},
+						sku: {
+							type: 'string',
+							example: 'LAP-HP-001',
+							nullable: true,
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						description: {
+							type: 'string',
+							example: 'Laptop HP 16GB RAM',
+							nullable: true,
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						stock: {
+							type: 'number',
+							example: 10,
+						},
+						reservedStock: {
+							type: 'number',
+							example: 2,
+						},
+						minStock: {
+							type: 'number',
+							example: 3,
+						},
+						maxStock: {
+							type: 'number',
+							example: 50,
+							nullable: true,
+						},
+						taxRate: {
+							type: 'number',
+							example: 0.16,
+						},
+						trackStock: {
+							type: 'boolean',
+							example: true,
+						},
+						allowNegative: {
+							type: 'boolean',
+							example: false,
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
+						},
+					},
+				},
+
+				ProductList: {
+					type: 'object',
+					required: ['id', 'name', 'price', 'stock', 'minStock', 'isActive'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						stock: {
+							type: 'number',
+							example: 10,
+						},
+						minStock: {
+							type: 'number',
+							example: 3,
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
 						},
 					},
 				},
@@ -335,8 +414,26 @@ export const swaggerSpec = swaggerJsdoc({
 								data: {
 									type: 'array',
 									items: {
-										$ref: '#/components/schemas/Product',
+										$ref: '#/components/schemas/ProductList',
 									},
+								},
+							},
+							example: {
+								data: [
+									{
+										id: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+										name: 'Laptop HP',
+										price: 15000,
+										stock: 10,
+										minStock: 3,
+										isActive: true,
+									},
+								],
+								meta: {
+									total: 1,
+									page: 1,
+									limit: 10,
+									totalPages: 1,
 								},
 							},
 						},
@@ -553,6 +650,36 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				ProductAlreadyExistsError: {
+					description: 'Ya existe un producto con ese identificador',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_EXISTS',
+								message: 'Ya existe un producto con ese identificador',
+							},
+						},
+					},
+				},
+
+				ProductAlreadyDeletedError: {
+					description: 'El producto ya eliminado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_DELETED',
+								message: 'El producto ya se encuentra eliminado',
+							},
+						},
+					},
+				},
+
 				ProductInsufficientStockError: {
 					description: 'Stock insuficiente',
 					content: {
@@ -621,6 +748,106 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				DeleteProductConflictError: {
+					description: 'Conflicto relacionado con la eliminación de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_DELETED',
+								message: 'El producto ya se encuentra eliminado',
+							},
+						},
+					},
+				},
+
+				InvalidQueryParamsError: {
+					description: 'Parámetros de consulta inválidos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'INVALID_QUERY_PARAMS',
+								message: 'Parámetros de consulta inválidos',
+							},
+						},
+					},
+				},
+
+				CreateProductConflictError: {
+					description: 'Conflicto relacionado con la creación de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_EXISTS',
+								message: 'Ya existe un producto con ese identificador',
+							},
+						},
+					},
+				},
+
+				UpdateProductConflictError: {
+					description:
+						'Conflicto relacionado con la actualización de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							examples: {
+								productAlreadyExists: {
+									summary: 'SKU o barcode duplicado',
+									value: {
+										code: 'PRODUCT_ALREADY_EXISTS',
+										message: 'Ya existe un producto con ese identificador',
+									},
+								},
+								productAlreadyDeleted: {
+									summary: 'Producto ya eliminado',
+									value: {
+										code: 'PRODUCT_ALREADY_DELETED',
+										message: 'El producto ya se encuentra eliminado',
+									},
+								},
+							},
+						},
+					},
+				},
+
+				CashRegisterConflictError: {
+					description: 'Conflicto relacionado con cajas registradoras',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							examples: {
+								cashRegisterAlreadyExists: {
+									summary: 'Caja registradora ya existe',
+									value: {
+										code: 'CASH_REGISTER_ALREADY_EXISTS',
+										message: 'Caja registradora ya existe con ese nombre',
+									},
+								},
+								cashRegisterInactive: {
+									summary: 'Caja registradora inactiva',
+									value: {
+										code: 'CASH_REGISTER_IS_NOT_ACTIVE',
+										message: 'La caja registradora no se encuentra activa',
+									},
+								},
+							},
+						},
+					},
+				},
+
 				TooManyRequestsError: {
 					description: 'Demasiadas solicitudes',
 					content: {
@@ -660,7 +887,7 @@ export const swaggerSpec = swaggerJsdoc({
 			{ name: 'Products', description: 'Gestión de productos' },
 			{ name: 'Movements', description: 'Movimientos de inventario' },
 			{ name: 'AuditLogs', description: 'Registros de auditoría' },
-			{ name: 'Movements', description: 'Cajas registradoras' },
+			{ name: 'CashRegisters', description: 'Cajas registradoras' },
 		],
 	},
 	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],
