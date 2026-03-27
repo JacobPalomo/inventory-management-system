@@ -1,6 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc'
 import { env } from './env'
-import { AuditAction, EntityType } from '@prisma/client'
 
 export const swaggerSpec = swaggerJsdoc({
 	definition: {
@@ -127,9 +126,7 @@ export const swaggerSpec = swaggerJsdoc({
 						name: { type: 'string', example: 'Jacob' },
 						email: { type: 'string', example: 'jacob@test.com' },
 						role: {
-							type: 'string',
-							enum: ['ADMIN', 'EDITOR', 'VIEWER'],
-							example: 'ADMIN',
+							$ref: '#/components/schemas/Role',
 						},
 						shiftId: {
 							type: 'string',
@@ -138,7 +135,7 @@ export const swaggerSpec = swaggerJsdoc({
 						},
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
+							format: 'date-time',
 							example: '2026-03-19T23:57:02.901Z',
 						},
 						createdById: {
@@ -164,7 +161,7 @@ export const swaggerSpec = swaggerJsdoc({
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
+							format: 'date-time',
 							example: '2026-03-19T23:57:02.901Z',
 						},
 					},
@@ -176,7 +173,7 @@ export const swaggerSpec = swaggerJsdoc({
 					properties: {
 						token: {
 							type: 'string',
-							format: 'JWTToken',
+							format: 'jwt',
 							example:
 								'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
 						},
@@ -197,13 +194,13 @@ export const swaggerSpec = swaggerJsdoc({
 						},
 						name: { type: 'string', example: 'Laptop HP' },
 						description: { type: 'string', example: '16GB RAM' },
-						stock: { type: 'number', example: 10 },
-						minStock: { type: 'number', example: 3 },
+						stock: { type: 'integer', example: 10 },
+						minStock: { type: 'integer', example: 3 },
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
-							example: '2025-01-01T00:00:00Z',
+							format: 'date-time',
+							example: '2026-01-01T00:00:00Z',
 						},
 					},
 				},
@@ -222,17 +219,46 @@ export const swaggerSpec = swaggerJsdoc({
 							enum: ['IN', 'OUT'],
 							example: 'OUT',
 						},
-						quantity: { type: 'number', example: 5 },
+						quantity: { type: 'integer', example: 5 },
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
-							example: '2025-01-01T00:00:00Z',
+							format: 'date-time',
+							example: '2026-01-01T00:00:00Z',
 						},
 						product: {
 							$ref: '#/components/schemas/Product',
 						},
 						user: {
 							$ref: '#/components/schemas/User',
+						},
+					},
+				},
+
+				CashRegister: {
+					type: 'object',
+					required: ['id', 'name', 'isActive', 'createdAt'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '5d2b4903-af5a-4784-9436-fe734750730e',
+						},
+						name: {
+							type: 'string',
+							example: 'Caja 1',
+						},
+						description: {
+							type: 'string',
+							example: 'Caja principal',
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
+						},
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-01-01T00:00:00Z',
 						},
 					},
 				},
@@ -357,6 +383,23 @@ export const swaggerSpec = swaggerJsdoc({
 						{
 							$ref: '#/components/schemas/PaginatedBase',
 						},
+					],
+				},
+
+				PaginatedCashRegisters: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/CashRegister',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
 					],
 				},
 
@@ -616,6 +659,8 @@ export const swaggerSpec = swaggerJsdoc({
 			{ name: 'Shifts', description: 'Turnos de empleados' },
 			{ name: 'Products', description: 'Gestión de productos' },
 			{ name: 'Movements', description: 'Movimientos de inventario' },
+			{ name: 'AuditLogs', description: 'Registros de auditoría' },
+			{ name: 'Movements', description: 'Cajas registradoras' },
 		],
 	},
 	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],
