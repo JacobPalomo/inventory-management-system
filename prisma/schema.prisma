@@ -57,6 +57,21 @@ model Attendance {
     createdAt DateTime @default(now())
 }
 
+//////////////////////////////////////////////////////
+// CAJAS
+//////////////////////////////////////////////////////
+
+model CashRegister {
+    id String @id @default(uuid())
+
+    name        String
+    description String?
+
+    isActive Boolean @default(true)
+
+    createdAt DateTime @default(now())
+}
+
 model Product {
     id          String     @id @default(uuid())
     name        String
