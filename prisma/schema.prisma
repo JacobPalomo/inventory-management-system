@@ -11,6 +11,11 @@ datasource db {
 // ENUMS
 //////////////////////////////////////////////////////
 
+enum CashSessionStatus {
+    OPEN
+    CLOSED
+}
+
 enum SaleStatus {
     OPEN
     PAID
@@ -48,13 +53,15 @@ model User {
     usersCreated User[]  @relation("UserCreatedBy")
 
     // Relaciones POS
-    sales Sale[]
+    cashSessions CashSession[]
+    sales        Sale[]
 
     // Cancelaciones
-    voidedSales        Sale[]     @relation("SaleVoidedBy")
-    voidedSaleItems    SaleItem[] @relation("SaleItemVoidedBy")
-    cancelledSaleItems SaleItem[] @relation("SaleItemCancelledBy")
-    cancelledSales     Sale[]     @relation("SaleCancelledBy")
+    voidedSales        Sale[]        @relation("SaleVoidedBy")
+    voidedSaleItems    SaleItem[]    @relation("SaleItemVoidedBy")
+    cancelledSaleItems SaleItem[]    @relation("SaleItemCancelledBy")
+    cancelledSales     Sale[]        @relation("SaleCancelledBy")
+    closedSessions     CashSession[] @relation("CashClosedBy")
 }
 
 model Shift {
@@ -98,6 +105,37 @@ model CashRegister {
     isActive Boolean @default(true)
 
     createdAt DateTime @default(now())
+
+    sessions CashSession[]
+}
+
+//////////////////////////////////////////////////////
+// SESIÓN CAJA
+//////////////////////////////////////////////////////
+
+model CashSession {
+    id String @id @default(uuid())
+
+    registerId String
+    userId     String
+
+    openingAmount  Float
+    expectedAmount Float?
+    countedAmount  Float?
+    difference     Float?
+
+    status CashSessionStatus @default(OPEN)
+
+    openedAt DateTime  @default(now())
+    closedAt DateTime?
+
+    closedById String?
+    closedBy   User?   @relation("CashClosedBy", fields: [closedById], references: [id])
+
+    register CashRegister @relation(fields: [registerId], references: [id])
+    user     User         @relation(fields: [userId], references: [id])
+
+    sales Sale[]
 }
 
 //////////////////////////////////////////////////////
@@ -133,7 +171,8 @@ model Sale {
     cancelledById String?
     cancelledBy   User?   @relation("SaleCancelledBy", fields: [cancelledById], references: [id])
 
-    user User @relation(fields: [userId], references: [id])
+    session CashSession? @relation(fields: [sessionId], references: [id])
+    user    User         @relation(fields: [userId], references: [id])
 
     items SaleItem[]
 }
