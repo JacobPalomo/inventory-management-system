@@ -505,6 +505,12 @@ export const swaggerSpec = swaggerJsdoc({
 					example: 'OPEN',
 				},
 
+				PaymentMethod: {
+					type: 'string',
+					enum: ['CASH', 'CARD', 'TRANSFER', 'DIGITAL_WALLET', 'OTHER'],
+					example: 'CASH',
+				},
+
 				SaleItemStatus: {
 					type: 'string',
 					enum: ['ACTIVE', 'CANCELLED', 'REFUNDED'],
@@ -523,6 +529,31 @@ export const swaggerSpec = swaggerJsdoc({
 						name: {
 							type: 'string',
 							example: 'Jacob',
+						},
+					},
+				},
+
+				PaymentSaleSummary: {
+					type: 'object',
+					required: ['id', 'status', 'total'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '66cba4df-57f0-4b7b-a16b-3be12b72c4e3',
+						},
+						sessionId: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '50fa8bea-75de-45a2-b70b-5f68b8375fd7',
+						},
+						status: {
+							$ref: '#/components/schemas/SaleStatus',
+						},
+						total: {
+							type: 'number',
+							example: 34220,
 						},
 					},
 				},
@@ -657,6 +688,8 @@ export const swaggerSpec = swaggerJsdoc({
 						'tax',
 						'discount',
 						'total',
+						'paidAmount',
+						'remainingAmount',
 						'isVoided',
 						'createdAt',
 						'updatedAt',
@@ -705,6 +738,14 @@ export const swaggerSpec = swaggerJsdoc({
 						total: {
 							type: 'number',
 							example: 34220,
+						},
+						paidAmount: {
+							type: 'number',
+							example: 1200,
+						},
+						remainingAmount: {
+							type: 'number',
+							example: 33020,
 						},
 						notes: {
 							type: 'string',
@@ -762,6 +803,65 @@ export const swaggerSpec = swaggerJsdoc({
 							items: {
 								$ref: '#/components/schemas/SaleItem',
 							},
+						},
+						payments: {
+							type: 'array',
+							items: {
+								$ref: '#/components/schemas/Payment',
+							},
+						},
+					},
+				},
+
+				Payment: {
+					type: 'object',
+					required: [
+						'id',
+						'saleId',
+						'userId',
+						'user',
+						'method',
+						'amount',
+						'createdAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '0c0fb0b4-4c0f-4e6a-b28e-4f5a2f3f0d2a',
+						},
+						saleId: {
+							type: 'string',
+							format: 'uuid',
+							example: '66cba4df-57f0-4b7b-a16b-3be12b72c4e3',
+						},
+						sale: {
+							$ref: '#/components/schemas/PaymentSaleSummary',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						user: {
+							$ref: '#/components/schemas/SaleUserSummary',
+						},
+						method: {
+							$ref: '#/components/schemas/PaymentMethod',
+						},
+						amount: {
+							type: 'number',
+							example: 1200,
+						},
+						reference: {
+							type: 'string',
+							nullable: true,
+							example: 'Ticket 12345',
+						},
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T10:30:00.000Z',
 						},
 					},
 				},
@@ -950,6 +1050,23 @@ export const swaggerSpec = swaggerJsdoc({
 									type: 'array',
 									items: {
 										$ref: '#/components/schemas/Sale',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
+				},
+
+				PaginatedPayments: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Payment',
 									},
 								},
 							},
