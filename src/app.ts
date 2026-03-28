@@ -13,6 +13,7 @@ import usersRoutes from './modules/users/user.routes'
 import shiftsRoutes from './modules/shifts/shift.routes'
 import productsRoutes from './modules/products/product.routes'
 import movementsRoutes from './modules/movements/movement.routes'
+import salesRoutes from './modules/sales/sale.routes'
 
 const app = express()
 
@@ -41,6 +42,7 @@ app.use('/api/users', usersRoutes)
 app.use('/api/shifts', shiftsRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
+app.use('/api/sales', salesRoutes)
 
 app.get('/', (_req, res) => {
 	res.send('API running 🚀')

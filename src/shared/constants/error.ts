@@ -89,6 +89,22 @@ export const ERROR_CODES = {
 		message: 'La caja registradora no se encuentra activa',
 	},
 
+	// SALES
+	SALE_NOT_FOUND: {
+		statusCode: 404,
+		message: 'Venta no encontrada',
+	},
+
+	SALE_NOT_EDITABLE: {
+		statusCode: 409,
+		message: 'La venta ya no puede modificarse',
+	},
+
+	SALE_INVALID_ITEM_DISCOUNT: {
+		statusCode: 400,
+		message: 'El descuento del item no puede ser mayor que el subtotal',
+	},
+
 	// GENERIC
 	INVALID_QUERY_PARAMS: {
 		statusCode: 400,
