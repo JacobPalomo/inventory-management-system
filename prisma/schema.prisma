@@ -31,6 +31,14 @@ enum SaleItemStatus {
     REFUNDED
 }
 
+enum PaymentMethod {
+    CASH
+    CARD
+    TRANSFER
+    DIGITAL_WALLET
+    OTHER
+}
+
 model User {
     id       String @id @default(uuid())
     name     String
@@ -55,6 +63,7 @@ model User {
     // Relaciones POS
     cashSessions CashSession[]
     sales        Sale[]
+    payments     Payment[]
 
     // Cancelaciones
     voidedSales        Sale[]        @relation("SaleVoidedBy")
@@ -174,7 +183,8 @@ model Sale {
     session CashSession? @relation(fields: [sessionId], references: [id])
     user    User         @relation(fields: [userId], references: [id])
 
-    items SaleItem[]
+    items    SaleItem[]
+    payments Payment[]
 }
 
 model SaleItem {
@@ -211,6 +221,26 @@ model SaleItem {
 
     sale    Sale    @relation(fields: [saleId], references: [id])
     product Product @relation(fields: [productId], references: [id])
+}
+
+//////////////////////////////////////////////////////
+// PAGOS
+//////////////////////////////////////////////////////
+
+model Payment {
+    id String @id @default(uuid())
+
+    saleId String
+    userId String
+
+    method    PaymentMethod
+    amount    Float
+    reference String?
+
+    createdAt DateTime @default(now())
+
+    sale Sale @relation(fields: [saleId], references: [id])
+    user User @relation(fields: [userId], references: [id])
 }
 
 model Product {
