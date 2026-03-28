@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { paymentEmbeddedSelect } from '../payments/payment.types'
 
 const safeUserSelect = {
 	id: true,
@@ -72,6 +73,9 @@ export const saleDetailSelect = {
 	...saleSelect,
 	items: {
 		select: saleItemSelect,
+	},
+	payments: {
+		select: paymentEmbeddedSelect,
 	},
 } satisfies Prisma.SaleSelect
 

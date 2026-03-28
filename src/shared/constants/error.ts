@@ -126,6 +126,22 @@ export const ERROR_CODES = {
 		message: 'El descuento del item no puede ser mayor que el subtotal',
 	},
 
+	// PAYMENTS
+	PAYMENT_NOT_FOUND: {
+		statusCode: 404,
+		message: 'Pago no encontrado',
+	},
+
+	PAYMENT_SALE_NOT_PAYABLE: {
+		statusCode: 409,
+		message: 'La venta no puede recibir pagos',
+	},
+
+	PAYMENT_EXCEEDS_REMAINING_BALANCE: {
+		statusCode: 409,
+		message: 'El pago excede el saldo pendiente',
+	},
+
 	// GENERIC
 	INVALID_QUERY_PARAMS: {
 		statusCode: 400,

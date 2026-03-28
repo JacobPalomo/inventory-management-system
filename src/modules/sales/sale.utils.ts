@@ -85,7 +85,7 @@ export const buildSalesWhere = (query: TSalesQuery): Prisma.SaleWhereInput => {
 export const buildSalesSelect = (withItems?: boolean) =>
 	withItems ? saleDetailSelect : saleSelect
 
-const roundMoney = (value: number): number =>
+export const roundMoney = (value: number): number =>
 	Math.round((value + Number.EPSILON) * 100) / 100
 
 export const calculateSaleItemAmounts = (params: {
