@@ -6,6 +6,15 @@ import {
 	TZodUpdateUser,
 } from './user.types'
 import { Role } from '@prisma/client'
+import { withPagination } from '../../shared/schemas/pagination.schema'
+
+const usersFilterSchema = z.object({
+	search: z.string().optional(),
+})
+
+export const usersQuerySchema = withPagination(usersFilterSchema)
+
+export type TUsersQuery = z.infer<typeof usersQuerySchema>
 
 export const createUserSchema = z.object<TZodCreateUser>({
 	name: z.string().min(3, 'El nombre debe contener al menos 3 caracteres'),

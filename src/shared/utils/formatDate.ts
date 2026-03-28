@@ -1,4 +1,4 @@
-import { env } from '../config/env'
+import { env } from '../../config/env'
 import { startOfDay, endOfDay } from 'date-fns'
 import { fromZonedTime } from 'date-fns-tz'
 

@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express'
 import { AuthRequest } from './auth.middleware'
-import { AppError } from '../utils/AppError'
+import { AppError } from '../shared/utils/AppError'
 
 export const authorizeRoles =
 	(...roles: string[]) =>

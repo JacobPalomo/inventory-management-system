@@ -1,13 +1,17 @@
 import { NextFunction, Request, Response } from 'express'
-import { ShiftQuery, TCreateShift, TUpdateShift } from './shift.types'
+import { TCreateShift, TUpdateShift } from './shift.types'
 import {
 	createShiftService,
 	deleteShiftService,
 	getShiftsService,
 	updateShiftService,
 } from './shift.service'
-import { createShiftSchema, updateShiftSchema } from './shift.schema'
-import { timeToMinutes } from '../../utils/time'
+import {
+	createShiftSchema,
+	shiftsQuerySchema,
+	updateShiftSchema,
+} from './shift.schema'
+import { timeToMinutes } from '../../shared/utils/time'
 
 export const getShifts = async (
 	req: Request,
@@ -15,14 +19,7 @@ export const getShifts = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search, isActive } = req.query
-
-		const query: ShiftQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-			isActive: isActive as string,
-		}
+		const query = shiftsQuerySchema.parse(req.query)
 
 		const result = await getShiftsService(query)
 		res.status(200).json(result)

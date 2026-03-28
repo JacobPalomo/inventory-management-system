@@ -16,6 +16,10 @@ export const errorMiddleware = (
 		return res.status(400).json({
 			code: 'VALIDATION_ERROR',
 			message: 'Error de validación',
+			details: JSON.parse(err.message).map((error: any) => ({
+				field: error.path[0],
+				message: error.message,
+			})),
 		})
 	}
 

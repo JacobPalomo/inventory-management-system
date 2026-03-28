@@ -1,51 +1,36 @@
 import { NextFunction, Response } from 'express'
-import { MovementType } from '@prisma/client'
 import { AuthRequest } from '../../middlewares/auth.middleware'
 import { createMovementService, getMovementsService } from './movement.service'
-import { movementSchema } from './movement.schema'
-import { MovementQuery } from './movement.types'
+import { movementQuerySchema, movementSchema } from './movement.schema'
+import { MovementType } from '@prisma/client'
+
+const createMovement = async (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction,
+	type: MovementType,
+) => {
+	try {
+		const validated = movementSchema.parse(req.body)
+		const result = await createMovementService(req.user.id, type, validated)
+
+		res.status(201).json(result)
+	} catch (error) {
+		next(error)
+	}
+}
 
 export const createEntry = async (
 	req: AuthRequest,
 	res: Response,
 	next: NextFunction,
-) => {
-	try {
-		const { productId, quantity } = movementSchema.parse(req.body)
-
-		const result = await createMovementService(
-			req.user.id,
-			'IN',
-			productId,
-			quantity,
-		)
-
-		res.status(201).json(result)
-	} catch (error) {
-		next(error)
-	}
-}
+) => createMovement(req, res, next, MovementType.IN)
 
 export const createExit = async (
 	req: AuthRequest,
 	res: Response,
 	next: NextFunction,
-) => {
-	try {
-		const { productId, quantity } = movementSchema.parse(req.body)
-
-		const result = await createMovementService(
-			req.user.id,
-			'OUT',
-			productId,
-			quantity,
-		)
-
-		res.status(201).json(result)
-	} catch (error) {
-		next(error)
-	}
-}
+) => createMovement(req, res, next, MovementType.OUT)
 
 export const getMovements = async (
 	req: AuthRequest,
@@ -53,19 +38,7 @@ export const getMovements = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search, movementType, productId, userId, from, to } =
-			req.query
-
-		const query: MovementQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-			movementType: movementType as MovementType,
-			productId: productId as string,
-			userId: userId as string,
-			from: new Date(from as string),
-			to: new Date(to as string),
-		}
+		const query = movementQuerySchema.parse(req.query)
 
 		const movements = await getMovementsService(query)
 		res.json(movements)

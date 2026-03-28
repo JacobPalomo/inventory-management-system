@@ -1,10 +1,5 @@
 import { Role } from '@prisma/client'
 import z from 'zod'
-import { PaginationQuery } from '../../types/pagination'
-
-export interface UserQuery extends PaginationQuery {
-	search?: string
-}
 
 export interface UserResponse {
 	id: string

@@ -1,13 +1,25 @@
 import { NextFunction, Request, Response } from 'express'
-import { ProductQuery, TCreateProduct, TUpdateProduct } from './product.types'
+
 import {
 	createProductService,
 	getProductsService,
 	getProductByIdService,
 	updateProductService,
 	deleteProductService,
+	restoreProductService,
+	getProductByBarcodeService,
+	adjustProductStockService,
 } from './product.service'
-import { createProductSchema, updateProductSchema } from './product.schema'
+
+import {
+	adjustProductStockSchema,
+	createProductSchema,
+	productBarcodeParamSchema,
+	productIdSchema,
+	productsQuerySchema,
+	updateProductSchema,
+} from './product.schema'
+import { AuthRequest } from '../../middlewares/auth.middleware'
 
 export const createProduct = async (
 	req: Request,
@@ -15,8 +27,10 @@ export const createProduct = async (
 	next: NextFunction,
 ) => {
 	try {
-		const validated = createProductSchema.parse(req.body) as TCreateProduct
+		const validated = createProductSchema.parse(req.body)
+
 		const product = await createProductService(validated)
+
 		res.status(201).json(product)
 	} catch (error) {
 		next(error)
@@ -29,17 +43,10 @@ export const getProducts = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { page, limit, search, isActive, lowStock } = req.query
-
-		const query: ProductQuery = {
-			page: page as string,
-			limit: limit as string,
-			search: search as string,
-			isActive: isActive as string,
-			lowStock: lowStock as string,
-		}
+		const query = productsQuerySchema.parse(req.query)
 
 		const result = await getProductsService(query)
+
 		res.json(result)
 	} catch (error) {
 		next(error)
@@ -52,7 +59,26 @@ export const getProductById = async (
 	next: NextFunction,
 ) => {
 	try {
-		const product = await getProductByIdService(req.params.id as string)
+		const params = productIdSchema.parse(req.params)
+
+		const product = await getProductByIdService(params.id)
+
+		res.json(product)
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const getProductByBarcode = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const params = productBarcodeParamSchema.parse(req.params)
+
+		const product = await getProductByBarcodeService(params.barcode)
+
 		res.json(product)
 	} catch (error) {
 		next(error)
@@ -65,11 +91,33 @@ export const updateProduct = async (
 	next: NextFunction,
 ) => {
 	try {
-		const validated = updateProductSchema.parse(req.body) as TUpdateProduct
-		const product = await updateProductService(
-			req.params.id as string,
-			validated,
+		const params = productIdSchema.parse(req.params)
+		const validated = updateProductSchema.parse(req.body)
+
+		const product = await updateProductService(params.id, validated)
+
+		res.json(product)
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const adjustProductStock = async (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const params = productIdSchema.parse(req.params)
+		const validated = adjustProductStockSchema.parse(req.body)
+
+		const product = await adjustProductStockService(
+			params.id,
+			validated.quantity,
+			validated.reason,
+			req.user.id,
 		)
+
 		res.json(product)
 	} catch (error) {
 		next(error)
@@ -82,8 +130,27 @@ export const deleteProduct = async (
 	next: NextFunction,
 ) => {
 	try {
-		await deleteProductService(req.params.id as string)
-		res.json({ message: 'Product deleted' })
+		const params = productIdSchema.parse(req.params)
+
+		const result = await deleteProductService(params.id)
+
+		res.json(result)
+	} catch (error) {
+		next(error)
+	}
+}
+
+export const restoreProduct = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const params = productIdSchema.parse(req.params)
+
+		const product = await restoreProductService(params.id)
+
+		res.json(product)
 	} catch (error) {
 		next(error)
 	}

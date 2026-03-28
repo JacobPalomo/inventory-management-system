@@ -32,6 +32,88 @@ export const swaggerSpec = swaggerJsdoc({
 					enum: ['ADMIN', 'EDITOR', 'VIEWER'],
 				},
 
+				// AUDITORÍA
+				AuditAction: {
+					type: 'string',
+					enum: ['CREATE', 'UPDATE', 'DELETE', 'STOCK_ADJUST', 'PRICE_CHANGE'],
+					example: 'UPDATE',
+				},
+				EntityType: {
+					type: 'string',
+					enum: [
+						'Auth',
+						'Movement',
+						'Product',
+						'Shift',
+						'User',
+						'CashSession',
+						'CashRegister',
+					],
+					example: 'User',
+				},
+				AuditLog: {
+					type: 'object',
+					required: [
+						'id',
+						'userId',
+						'user',
+						'action',
+						'entityId',
+						'entity',
+						'createdAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: 'cd872b4e-0a10-499b-bb63-d177f91f65c7',
+						},
+						action: {
+							$ref: '#/components/schemas/AuditAction',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: 'a2474e24-8a76-4c9a-96f4-c3c1eaa77f96',
+						},
+						user: {
+							type: 'object',
+							required: ['name'],
+							properties: {
+								name: {
+									type: 'string',
+									example: 'Jacob',
+								},
+							},
+						},
+						entityId: {
+							type: 'string',
+							format: 'uuid',
+							example: '3fb8bed4-38d4-415a-b949-f9591d41770b',
+						},
+						entity: {
+							$ref: '#/components/schemas/EntityType',
+						},
+						oldValue: {
+							type: 'object',
+							nullable: true,
+							additionalProperties: true,
+							description: 'Valor antes del cambio (JSON dinámico)',
+						},
+						newValue: {
+							type: 'object',
+							nullable: true,
+							additionalProperties: true,
+							description: 'Valor después del cambio (JSON dinámico)',
+						},
+						createdAt: {
+							type: 'string',
+							format: 'ISODate',
+							example: '2026-03-26T18:25:43.511Z',
+						},
+					},
+				},
+
 				// 🔐 USER
 				User: {
 					type: 'object',
@@ -44,9 +126,7 @@ export const swaggerSpec = swaggerJsdoc({
 						name: { type: 'string', example: 'Jacob' },
 						email: { type: 'string', example: 'jacob@test.com' },
 						role: {
-							type: 'string',
-							enum: ['ADMIN', 'EDITOR', 'VIEWER'],
-							example: 'ADMIN',
+							$ref: '#/components/schemas/Role',
 						},
 						shiftId: {
 							type: 'string',
@@ -55,7 +135,7 @@ export const swaggerSpec = swaggerJsdoc({
 						},
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
+							format: 'date-time',
 							example: '2026-03-19T23:57:02.901Z',
 						},
 						createdById: {
@@ -81,7 +161,7 @@ export const swaggerSpec = swaggerJsdoc({
 						isActive: { type: 'boolean', example: true },
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
+							format: 'date-time',
 							example: '2026-03-19T23:57:02.901Z',
 						},
 					},
@@ -93,7 +173,7 @@ export const swaggerSpec = swaggerJsdoc({
 					properties: {
 						token: {
 							type: 'string',
-							format: 'JWTToken',
+							format: 'jwt',
 							example:
 								'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
 						},
@@ -106,21 +186,100 @@ export const swaggerSpec = swaggerJsdoc({
 				// 📦 PRODUCT
 				Product: {
 					type: 'object',
+					required: ['id', 'name', 'price', 'stock', 'minStock', 'isActive'],
 					properties: {
 						id: {
 							type: 'string',
 							format: 'uuid',
 							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
 						},
-						name: { type: 'string', example: 'Laptop HP' },
-						description: { type: 'string', example: '16GB RAM' },
-						stock: { type: 'number', example: 10 },
-						minStock: { type: 'number', example: 3 },
-						isActive: { type: 'boolean', example: true },
-						createdAt: {
+						barcode: {
 							type: 'string',
-							format: 'ISODateTime',
-							example: '2025-01-01T00:00:00Z',
+							example: '7501234567890',
+							nullable: true,
+						},
+						sku: {
+							type: 'string',
+							example: 'LAP-HP-001',
+							nullable: true,
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						description: {
+							type: 'string',
+							example: 'Laptop HP 16GB RAM',
+							nullable: true,
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						stock: {
+							type: 'number',
+							example: 10,
+						},
+						reservedStock: {
+							type: 'number',
+							example: 2,
+						},
+						minStock: {
+							type: 'number',
+							example: 3,
+						},
+						maxStock: {
+							type: 'number',
+							example: 50,
+							nullable: true,
+						},
+						taxRate: {
+							type: 'number',
+							example: 0.16,
+						},
+						trackStock: {
+							type: 'boolean',
+							example: true,
+						},
+						allowNegative: {
+							type: 'boolean',
+							example: false,
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
+						},
+					},
+				},
+
+				ProductList: {
+					type: 'object',
+					required: ['id', 'name', 'price', 'stock', 'minStock', 'isActive'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						stock: {
+							type: 'number',
+							example: 10,
+						},
+						minStock: {
+							type: 'number',
+							example: 3,
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
 						},
 					},
 				},
@@ -139,17 +298,384 @@ export const swaggerSpec = swaggerJsdoc({
 							enum: ['IN', 'OUT'],
 							example: 'OUT',
 						},
-						quantity: { type: 'number', example: 5 },
+						productId: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						quantity: { type: 'integer', example: 5 },
+						cost: {
+							type: 'number',
+							example: 145.9,
+							nullable: true,
+						},
+						reason: {
+							type: 'string',
+							example: 'Ajuste por conteo físico',
+							nullable: true,
+						},
 						createdAt: {
 							type: 'string',
-							format: 'ISODateTime',
-							example: '2025-01-01T00:00:00Z',
+							format: 'date-time',
+							example: '2026-01-01T00:00:00Z',
 						},
 						product: {
-							$ref: '#/components/schemas/Product',
+							type: 'object',
+							properties: {
+								id: {
+									type: 'string',
+									format: 'uuid',
+									example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+								},
+								name: {
+									type: 'string',
+									example: 'Laptop HP',
+								},
+								sku: {
+									type: 'string',
+									example: 'LAP-HP-001',
+									nullable: true,
+								},
+								barcode: {
+									type: 'string',
+									example: '7501234567890',
+									nullable: true,
+								},
+								stock: {
+									type: 'number',
+									example: 10,
+								},
+								trackStock: {
+									type: 'boolean',
+									example: true,
+								},
+								isActive: {
+									type: 'boolean',
+									example: true,
+								},
+							},
 						},
 						user: {
-							$ref: '#/components/schemas/User',
+							type: 'object',
+							properties: {
+								id: {
+									type: 'string',
+									format: 'uuid',
+									example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+								},
+								name: {
+									type: 'string',
+									example: 'Jacob',
+								},
+								email: {
+									type: 'string',
+									example: 'jacob@test.com',
+								},
+								role: {
+									$ref: '#/components/schemas/Role',
+								},
+							},
+						},
+					},
+				},
+
+				CashRegister: {
+					type: 'object',
+					required: ['id', 'name', 'isActive', 'createdAt'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '5d2b4903-af5a-4784-9436-fe734750730e',
+						},
+						name: {
+							type: 'string',
+							example: 'Caja 1',
+						},
+						description: {
+							type: 'string',
+							example: 'Caja principal',
+						},
+						isActive: {
+							type: 'boolean',
+							example: true,
+						},
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-01-01T00:00:00Z',
+						},
+					},
+				},
+
+				SaleStatus: {
+					type: 'string',
+					enum: ['OPEN', 'PAID', 'CANCELLED', 'REFUNDED', 'HOLD', 'QUOTE'],
+					example: 'OPEN',
+				},
+
+				SaleItemStatus: {
+					type: 'string',
+					enum: ['ACTIVE', 'CANCELLED', 'REFUNDED'],
+					example: 'ACTIVE',
+				},
+
+				SaleUserSummary: {
+					type: 'object',
+					required: ['id', 'name'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						name: {
+							type: 'string',
+							example: 'Jacob',
+						},
+					},
+				},
+
+				SaleProductSummary: {
+					type: 'object',
+					required: ['id', 'name'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						barcode: {
+							type: 'string',
+							example: '7501234567890',
+							nullable: true,
+						},
+						sku: {
+							type: 'string',
+							example: 'LAP-HP-001',
+							nullable: true,
+						},
+					},
+				},
+
+				SaleItem: {
+					type: 'object',
+					required: [
+						'id',
+						'productId',
+						'product',
+						'quantity',
+						'price',
+						'discount',
+						'subtotal',
+						'tax',
+						'total',
+						'status',
+						'isVoided',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '1787d74f-734b-46c2-82dd-5fb8eb8d6ae9',
+						},
+						productId: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						product: {
+							$ref: '#/components/schemas/SaleProductSummary',
+						},
+						quantity: {
+							type: 'number',
+							example: 2,
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						cost: {
+							type: 'number',
+							example: 12000,
+							nullable: true,
+						},
+						discount: {
+							type: 'number',
+							example: 500,
+						},
+						subtotal: {
+							type: 'number',
+							example: 30000,
+						},
+						tax: {
+							type: 'number',
+							example: 4720,
+						},
+						total: {
+							type: 'number',
+							example: 34220,
+						},
+						status: {
+							$ref: '#/components/schemas/SaleItemStatus',
+						},
+						isVoided: {
+							type: 'boolean',
+							example: false,
+						},
+						voidedAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						voidedById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelledAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						cancelledById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelReason: {
+							type: 'string',
+							nullable: true,
+							example: 'Cancelado por solicitud del cliente',
+						},
+					},
+				},
+
+				Sale: {
+					type: 'object',
+					required: [
+						'id',
+						'userId',
+						'user',
+						'status',
+						'subtotal',
+						'tax',
+						'discount',
+						'total',
+						'isVoided',
+						'createdAt',
+						'updatedAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '66cba4df-57f0-4b7b-a16b-3be12b72c4e3',
+						},
+						sessionId: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '50fa8bea-75de-45a2-b70b-5f68b8375fd7',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						user: {
+							$ref: '#/components/schemas/SaleUserSummary',
+						},
+						customerId: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '7f1fb0e1-c406-4021-a0dd-4379069fb32a',
+						},
+						status: {
+							$ref: '#/components/schemas/SaleStatus',
+						},
+						subtotal: {
+							type: 'number',
+							example: 30000,
+						},
+						tax: {
+							type: 'number',
+							example: 4720,
+						},
+						discount: {
+							type: 'number',
+							example: 500,
+						},
+						total: {
+							type: 'number',
+							example: 34220,
+						},
+						notes: {
+							type: 'string',
+							nullable: true,
+							example: 'Venta mostrador',
+						},
+						isVoided: {
+							type: 'boolean',
+							example: false,
+						},
+						voidedAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						voidedById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						voidedBy: {
+							allOf: [
+								{ $ref: '#/components/schemas/SaleUserSummary' },
+							],
+							nullable: true,
+						},
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T08:15:00.000Z',
+						},
+						updatedAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T08:20:00.000Z',
+						},
+						cancelledAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						cancelledById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelledBy: {
+							allOf: [
+								{ $ref: '#/components/schemas/SaleUserSummary' },
+							],
+							nullable: true,
+						},
+						items: {
+							type: 'array',
+							items: {
+								$ref: '#/components/schemas/SaleItem',
+							},
 						},
 					},
 				},
@@ -177,6 +703,24 @@ export const swaggerSpec = swaggerJsdoc({
 							$ref: '#/components/schemas/PaginatedMeta',
 						},
 					},
+				},
+
+				// AUDITORÍA
+				PaginatedAuditLogs: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/AuditLog',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
 				},
 
 				// 👤 USERS
@@ -208,8 +752,26 @@ export const swaggerSpec = swaggerJsdoc({
 								data: {
 									type: 'array',
 									items: {
-										$ref: '#/components/schemas/Product',
+										$ref: '#/components/schemas/ProductList',
 									},
+								},
+							},
+							example: {
+								data: [
+									{
+										id: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+										name: 'Laptop HP',
+										price: 15000,
+										stock: 10,
+										minStock: 3,
+										isActive: true,
+									},
+								],
+								meta: {
+									total: 1,
+									page: 1,
+									limit: 10,
+									totalPages: 1,
 								},
 							},
 						},
@@ -256,6 +818,40 @@ export const swaggerSpec = swaggerJsdoc({
 						{
 							$ref: '#/components/schemas/PaginatedBase',
 						},
+					],
+				},
+
+				PaginatedCashRegisters: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/CashRegister',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
+				},
+
+				PaginatedSales: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Sale',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
 					],
 				},
 
@@ -409,6 +1005,36 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				ProductAlreadyExistsError: {
+					description: 'Ya existe un producto con ese identificador',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_EXISTS',
+								message: 'Ya existe un producto con ese identificador',
+							},
+						},
+					},
+				},
+
+				ProductAlreadyDeletedError: {
+					description: 'El producto ya eliminado',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_DELETED',
+								message: 'El producto ya se encuentra eliminado',
+							},
+						},
+					},
+				},
+
 				ProductInsufficientStockError: {
 					description: 'Stock insuficiente',
 					content: {
@@ -419,6 +1045,52 @@ export const swaggerSpec = swaggerJsdoc({
 							example: {
 								code: 'PRODUCT_INSUFFICIENT_STOCK',
 								message: 'Stock insuficiente',
+							},
+						},
+					},
+				},
+
+				// SALES
+				SaleNotFoundError: {
+					description: 'Venta no encontrada',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_NOT_FOUND',
+								message: 'Venta no encontrada',
+							},
+						},
+					},
+				},
+
+				SaleNotEditableError: {
+					description: 'La venta ya no puede modificarse',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_NOT_EDITABLE',
+								message: 'La venta ya no puede modificarse',
+							},
+						},
+					},
+				},
+
+				SaleInvalidItemDiscountError: {
+					description: 'El descuento del item no puede ser mayor que el subtotal',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_INVALID_ITEM_DISCOUNT',
+								message: 'El descuento del item no puede ser mayor que el subtotal',
 							},
 						},
 					},
@@ -477,6 +1149,106 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				DeleteProductConflictError: {
+					description: 'Conflicto relacionado con la eliminación de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_DELETED',
+								message: 'El producto ya se encuentra eliminado',
+							},
+						},
+					},
+				},
+
+				InvalidQueryParamsError: {
+					description: 'Parámetros de consulta inválidos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'INVALID_QUERY_PARAMS',
+								message: 'Parámetros de consulta inválidos',
+							},
+						},
+					},
+				},
+
+				CreateProductConflictError: {
+					description: 'Conflicto relacionado con la creación de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'PRODUCT_ALREADY_EXISTS',
+								message: 'Ya existe un producto con ese identificador',
+							},
+						},
+					},
+				},
+
+				UpdateProductConflictError: {
+					description:
+						'Conflicto relacionado con la actualización de productos',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							examples: {
+								productAlreadyExists: {
+									summary: 'SKU o barcode duplicado',
+									value: {
+										code: 'PRODUCT_ALREADY_EXISTS',
+										message: 'Ya existe un producto con ese identificador',
+									},
+								},
+								productAlreadyDeleted: {
+									summary: 'Producto ya eliminado',
+									value: {
+										code: 'PRODUCT_ALREADY_DELETED',
+										message: 'El producto ya se encuentra eliminado',
+									},
+								},
+							},
+						},
+					},
+				},
+
+				CashRegisterConflictError: {
+					description: 'Conflicto relacionado con cajas registradoras',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							examples: {
+								cashRegisterAlreadyExists: {
+									summary: 'Caja registradora ya existe',
+									value: {
+										code: 'CASH_REGISTER_ALREADY_EXISTS',
+										message: 'Caja registradora ya existe con ese nombre',
+									},
+								},
+								cashRegisterInactive: {
+									summary: 'Caja registradora inactiva',
+									value: {
+										code: 'CASH_REGISTER_IS_NOT_ACTIVE',
+										message: 'La caja registradora no se encuentra activa',
+									},
+								},
+							},
+						},
+					},
+				},
+
 				TooManyRequestsError: {
 					description: 'Demasiadas solicitudes',
 					content: {
@@ -515,6 +1287,9 @@ export const swaggerSpec = swaggerJsdoc({
 			{ name: 'Shifts', description: 'Turnos de empleados' },
 			{ name: 'Products', description: 'Gestión de productos' },
 			{ name: 'Movements', description: 'Movimientos de inventario' },
+			{ name: 'Sales', description: 'Gestión de ventas' },
+			{ name: 'AuditLogs', description: 'Registros de auditoría' },
+			{ name: 'CashRegisters', description: 'Cajas registradoras' },
 		],
 	},
 	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],
