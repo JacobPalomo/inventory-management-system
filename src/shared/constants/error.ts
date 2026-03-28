@@ -89,6 +89,27 @@ export const ERROR_CODES = {
 		message: 'La caja registradora no se encuentra activa',
 	},
 
+	// CASH_SESSIONS
+	CASH_SESSION_NOT_FOUND: {
+		statusCode: 404,
+		message: 'Sesión de caja no encontrada',
+	},
+
+	ACTIVE_CASH_SESSION_CONFLICT: {
+		statusCode: 409,
+		message: 'El usuario ya tiene una sesión de caja abierta',
+	},
+
+	CASH_REGISTER_ALREADY_HAS_ACTIVE_SESSION: {
+		statusCode: 409,
+		message: 'La caja registradora ya tiene una sesión abierta',
+	},
+
+	CASH_SESSION_ALREADY_CLOSED: {
+		statusCode: 409,
+		message: 'La sesión de caja ya fue cerrada',
+	},
+
 	// SALES
 	SALE_NOT_FOUND: {
 		statusCode: 404,

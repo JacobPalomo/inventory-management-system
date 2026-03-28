@@ -1,7 +1,8 @@
-import { MovementType } from '@prisma/client'
+import { CashSessionStatus, MovementType } from '@prisma/client'
 import { prisma } from '../../config/prisma'
 import { PaginationResponse } from '../../shared/types/pagination'
 import { AppError } from '../../shared/utils/AppError'
+import { findCashSessionByIdRepo } from '../cash-sessions/cash-session.repository'
 import { applyMovementInTransaction } from '../movements/movement.helpers'
 import {
 	TAddItemToSale,
@@ -28,7 +29,21 @@ import {
 export const createSaleService = async (
 	userId: string,
 	data: TCreateSale,
-): Promise<TSale> => createSaleRepo(userId, data)
+): Promise<TSale> => {
+	if (data.sessionId) {
+		const cashSession = await findCashSessionByIdRepo(data.sessionId)
+
+		if (!cashSession) {
+			throw new AppError('CASH_SESSION_NOT_FOUND')
+		}
+
+		if (cashSession.status !== CashSessionStatus.OPEN) {
+			throw new AppError('CASH_SESSION_ALREADY_CLOSED')
+		}
+	}
+
+	return createSaleRepo(userId, data)
+}
 
 export const getSalesService = async (
 	query: TSalesQuery,

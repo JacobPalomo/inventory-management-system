@@ -413,6 +413,92 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				CashSessionStatus: {
+					type: 'string',
+					enum: ['OPEN', 'CLOSED'],
+					example: 'OPEN',
+				},
+
+				CashSession: {
+					type: 'object',
+					required: [
+						'id',
+						'registerId',
+						'register',
+						'userId',
+						'user',
+						'openingAmount',
+						'status',
+						'openedAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: 'c51ea7df-626a-4abf-a818-1d2d4624d0d8',
+						},
+						registerId: {
+							type: 'string',
+							format: 'uuid',
+							example: '5d2b4903-af5a-4784-9436-fe734750730e',
+						},
+						register: {
+							$ref: '#/components/schemas/CashRegister',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						user: {
+							$ref: '#/components/schemas/User',
+						},
+						openingAmount: {
+							type: 'number',
+							example: 1000,
+						},
+						expectedAmount: {
+							type: 'number',
+							nullable: true,
+							example: 2450,
+						},
+						countedAmount: {
+							type: 'number',
+							nullable: true,
+							example: 2440,
+						},
+						difference: {
+							type: 'number',
+							nullable: true,
+							example: -10,
+						},
+						status: {
+							$ref: '#/components/schemas/CashSessionStatus',
+						},
+						openedAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T08:00:00.000Z',
+						},
+						closedAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+							example: '2026-03-27T17:00:00.000Z',
+						},
+						closedById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						closedBy: {
+							allOf: [{ $ref: '#/components/schemas/User' }],
+							nullable: true,
+						},
+					},
+				},
+
 				SaleStatus: {
 					type: 'string',
 					enum: ['OPEN', 'PAID', 'CANCELLED', 'REFUNDED', 'HOLD', 'QUOTE'],
@@ -838,6 +924,23 @@ export const swaggerSpec = swaggerJsdoc({
 					],
 				},
 
+				PaginatedCashSessions: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/CashSession',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
+				},
+
 				PaginatedSales: {
 					allOf: [
 						{
@@ -1249,6 +1352,62 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				CashSessionNotFoundError: {
+					description: 'Sesión de caja no encontrada',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'CASH_SESSION_NOT_FOUND',
+								message: 'Sesión de caja no encontrada',
+							},
+						},
+					},
+				},
+
+				CashSessionConflictError: {
+					description: 'Conflicto relacionado con sesiones de caja',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							examples: {
+								activeCashSessionConflict: {
+									summary: 'El usuario ya tiene una sesión abierta',
+									value: {
+										code: 'ACTIVE_CASH_SESSION_CONFLICT',
+										message: 'El usuario ya tiene una sesión de caja abierta',
+									},
+								},
+								registerAlreadyHasActiveSession: {
+									summary: 'La caja ya tiene una sesión abierta',
+									value: {
+										code: 'CASH_REGISTER_ALREADY_HAS_ACTIVE_SESSION',
+										message: 'La caja registradora ya tiene una sesión abierta',
+									},
+								},
+								cashSessionAlreadyClosed: {
+									summary: 'La sesión ya fue cerrada',
+									value: {
+										code: 'CASH_SESSION_ALREADY_CLOSED',
+										message: 'La sesión de caja ya fue cerrada',
+									},
+								},
+								cashRegisterInactive: {
+									summary: 'Caja registradora inactiva',
+									value: {
+										code: 'CASH_REGISTER_IS_NOT_ACTIVE',
+										message: 'La caja registradora no se encuentra activa',
+									},
+								},
+							},
+						},
+					},
+				},
+
 				TooManyRequestsError: {
 					description: 'Demasiadas solicitudes',
 					content: {
@@ -1290,6 +1449,7 @@ export const swaggerSpec = swaggerJsdoc({
 			{ name: 'Sales', description: 'Gestión de ventas' },
 			{ name: 'AuditLogs', description: 'Registros de auditoría' },
 			{ name: 'CashRegisters', description: 'Cajas registradoras' },
+			{ name: 'CashSessions', description: 'Sesiones de caja' },
 		],
 	},
 	apis: env.NODE_ENV === 'production' ? ['dist/**/*.js'] : ['src/**/*.ts'],

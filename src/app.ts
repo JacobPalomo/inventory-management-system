@@ -9,6 +9,7 @@ import { errorMiddleware } from './middlewares/error.middleware'
 import auditLogsRoutes from './modules/audit-logs/audit-log.routes'
 import authRoutes from './modules/auth/auth.routes'
 import cashRegisters from './modules/cash-registers/cash-register.routes'
+import cashSessions from './modules/cash-sessions/cash-session.routes'
 import usersRoutes from './modules/users/user.routes'
 import shiftsRoutes from './modules/shifts/shift.routes'
 import productsRoutes from './modules/products/product.routes'
@@ -38,6 +39,7 @@ setupDocs(app)
 app.use('/api/audit-logs', auditLogsRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/cash-registers', cashRegisters)
+app.use('/api/cash-sessions', cashSessions)
 app.use('/api/users', usersRoutes)
 app.use('/api/shifts', shiftsRoutes)
 app.use('/api/products', productsRoutes)
