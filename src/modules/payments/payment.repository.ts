@@ -1,6 +1,6 @@
 import { Prisma, SaleStatus } from '@prisma/client'
 import { prisma } from '../../config/prisma'
-import { saleDetailSelect, TSaleDetail } from '../sales/sale.types'
+import { saleDetailSelect, TSaleDetailRaw } from '../sales/sale.types'
 import { paymentSelect, TPayment } from './payment.types'
 
 export const findPaymentsRepo = async (params: {
@@ -92,7 +92,7 @@ export const updateSaleStatusAfterPaymentRepo = async (
 	tx: Prisma.TransactionClient,
 	saleId: string,
 	status: SaleStatus,
-): Promise<TSaleDetail> => {
+): Promise<TSaleDetailRaw> => {
 	return tx.sale.update({
 		where: { id: saleId },
 		data: { status },

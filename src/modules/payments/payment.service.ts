@@ -5,6 +5,7 @@ import { formatFromDate, formatToDate } from '../../shared/utils/formatDate'
 import { AppError } from '../../shared/utils/AppError'
 import { roundMoney } from '../sales/sale.utils'
 import { TSaleDetail } from '../sales/sale.types'
+import { withSalePaymentAmounts } from '../sales/sale.utils'
 import { TCreatePayment, TPaymentsQuery } from './payment.schema'
 import {
 	createPaymentRepo,
@@ -96,7 +97,7 @@ export const createPaymentService = async (
 
 		return {
 			payment,
-			sale: updatedSale,
+			sale: withSalePaymentAmounts(updatedSale, totalPaid),
 		}
 	})
 }

@@ -14,6 +14,7 @@ import {
 	createSaleRepo,
 	findSalesRepo,
 	getProductForSaleRepo,
+	getPaidAmountsBySaleIdsRepo,
 	getSaleByIdRepo,
 	getSaleEditableStateRepo,
 	getSaleTotalsRepo,
@@ -24,6 +25,7 @@ import {
 	buildSalesWhere,
 	calculateSaleItemAmounts,
 	isSaleEditable,
+	withSalePaymentAmounts,
 } from './sale.utils'
 
 export const createSaleService = async (
@@ -42,7 +44,9 @@ export const createSaleService = async (
 		}
 	}
 
-	return createSaleRepo(userId, data)
+	const sale = await createSaleRepo(userId, data)
+
+	return withSalePaymentAmounts(sale, 0)
 }
 
 export const getSalesService = async (
@@ -57,9 +61,15 @@ export const getSalesService = async (
 		where,
 		query,
 	})
+	const paidAmountsBySaleId = await getPaidAmountsBySaleIdsRepo(
+		data.map(sale => sale.id),
+	)
+	const enrichedData = data.map(sale =>
+		withSalePaymentAmounts(sale, paidAmountsBySaleId.get(sale.id) ?? 0),
+	)
 
 	return {
-		data,
+		data: enrichedData,
 		meta: {
 			total,
 			page: query.page,
@@ -78,7 +88,12 @@ export const getSaleByIdService = async (
 		throw new AppError('SALE_NOT_FOUND')
 	}
 
-	return sale
+	const paidAmount = sale.payments.reduce(
+		(total, payment) => total + payment.amount,
+		0,
+	)
+
+	return withSalePaymentAmounts(sale, paidAmount)
 }
 
 export const addItemToSaleService = async (params: {
@@ -140,6 +155,12 @@ export const addItemToSaleService = async (params: {
 
 		const totals = await getSaleTotalsRepo(tx, saleId)
 
-		return updateSaleTotalsRepo(tx, saleId, totals)
+		const updatedSale = await updateSaleTotalsRepo(tx, saleId, totals)
+		const paidAmount = updatedSale.payments.reduce(
+			(total, payment) => total + payment.amount,
+			0,
+		)
+
+		return withSalePaymentAmounts(updatedSale, paidAmount)
 	})
 }

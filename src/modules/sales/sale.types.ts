@@ -79,12 +79,21 @@ export const saleDetailSelect = {
 	},
 } satisfies Prisma.SaleSelect
 
-export type TSale = Prisma.SaleGetPayload<{
+export type TSaleRaw = Prisma.SaleGetPayload<{
 	select: typeof saleSelect
 }>
 
-export type TSaleDetail = Prisma.SaleGetPayload<{
+export type TSaleDetailRaw = Prisma.SaleGetPayload<{
 	select: typeof saleDetailSelect
 }>
+
+export type TSaleComputedAmounts = {
+	paidAmount: number
+	remainingAmount: number
+}
+
+export type TSale = TSaleRaw & TSaleComputedAmounts
+
+export type TSaleDetail = TSaleDetailRaw & TSaleComputedAmounts
 
 export type TSaleList = TSale | TSaleDetail

@@ -2,7 +2,7 @@ import { Prisma, SaleStatus } from '@prisma/client'
 import { AppError } from '../../shared/utils/AppError'
 import { TSalesQuery } from './sale.schema'
 import { formatFromDate, formatToDate } from '../../shared/utils/formatDate'
-import { saleDetailSelect, saleSelect } from './sale.types'
+import { saleDetailSelect, saleSelect, TSaleComputedAmounts } from './sale.types'
 
 export const buildSalesWhere = (query: TSalesQuery): Prisma.SaleWhereInput => {
 	const {
@@ -125,6 +125,34 @@ export const normalizeSaleTotals = (totals: {
 	discount: roundMoney(totals.discount ?? 0),
 	tax: roundMoney(totals.tax ?? 0),
 	total: roundMoney(totals.total ?? 0),
+})
+
+export const calculateSalePaymentAmounts = (
+	total: number,
+	paidAmount: number,
+): TSaleComputedAmounts => {
+	const normalizedTotal = roundMoney(total)
+	const normalizedPaidAmount = roundMoney(paidAmount)
+	const remainingAmount = roundMoney(
+		Math.max(normalizedTotal - normalizedPaidAmount, 0),
+	)
+
+	return {
+		paidAmount: normalizedPaidAmount,
+		remainingAmount,
+	}
+}
+
+export const withSalePaymentAmounts = <
+	TSaleLike extends {
+		total: number
+	},
+>(
+	sale: TSaleLike,
+	paidAmount: number,
+): TSaleLike & TSaleComputedAmounts => ({
+	...sale,
+	...calculateSalePaymentAmounts(sale.total, paidAmount),
 })
 
 export const isSaleEditable = (sale: {
