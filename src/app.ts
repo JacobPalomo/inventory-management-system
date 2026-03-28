@@ -6,14 +6,11 @@ import { setupDocs } from './docs'
 import { errorMiddleware } from './middlewares/error.middleware'
 
 // Route imports
-import auditLogsRoutes from './modules/audit-logs/audit-log.routes'
 import authRoutes from './modules/auth/auth.routes'
-import cashRegisters from './modules/cash-registers/cash-register.routes'
 import usersRoutes from './modules/users/user.routes'
 import shiftsRoutes from './modules/shifts/shift.routes'
 import productsRoutes from './modules/products/product.routes'
 import movementsRoutes from './modules/movements/movement.routes'
-import salesRoutes from './modules/sales/sale.routes'
 
 const app = express()
 
@@ -35,14 +32,11 @@ app.use(globalRateLimiter)
 setupDocs(app)
 
 // Routes config
-app.use('/api/audit-logs', auditLogsRoutes)
 app.use('/api/auth', authRoutes)
-app.use('/api/cash-registers', cashRegisters)
 app.use('/api/users', usersRoutes)
 app.use('/api/shifts', shiftsRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/movements', movementsRoutes)
-app.use('/api/sales', salesRoutes)
 
 app.get('/', (_req, res) => {
 	res.send('API running 🚀')
