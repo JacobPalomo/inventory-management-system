@@ -1,5 +1,10 @@
 import { Prisma } from '@prisma/client'
-import { ShiftResponse, TCreateShift, TUpdateShift } from './shift.types'
+import {
+	ShiftQuery,
+	ShiftResponse,
+	TCreateShift,
+	TUpdateShift,
+} from './shift.types'
 import {
 	createShiftRepo,
 	deleteShiftRepo,
@@ -8,17 +13,20 @@ import {
 	getShiftsRepo,
 	updateShiftRepo,
 } from './shift.repository'
-import { AppError } from '../../shared/utils/AppError'
+import { PaginatedResponse } from '../../types/pagination'
+import { AppError } from '../../utils/AppError'
 import { generateShiftResponse } from './shift.utils'
-import { TShiftsQuery } from './shift.schema'
-import { PaginationResponse } from '../../shared/types/pagination'
 
 export const getShiftsService = async (
-	query: TShiftsQuery,
-): Promise<PaginationResponse<ShiftResponse>> => {
-	const { page, limit, search, isActive } = query
-
+	query: ShiftQuery,
+): Promise<PaginatedResponse<ShiftResponse>> => {
+	const page = parseInt(query.page) || 1
+	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
+
+	const search = query.search || ''
+	const isActive =
+		query.isActive !== undefined ? query.isActive === 'true' : undefined
 
 	const where: Prisma.ShiftWhereInput = {
 		AND: [

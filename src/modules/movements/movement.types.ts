@@ -1,61 +1,22 @@
-import { MovementType, Prisma } from '@prisma/client'
-import { TProductDetail } from '../products/product.types'
+import z from 'zod'
+import { PaginationQuery } from '../../types/pagination'
+import { MovementType } from '@prisma/client'
 
-export const movementSelect = {
-	id: true,
-	productId: true,
-	userId: true,
-	type: true,
-	quantity: true,
-	cost: true,
-	reason: true,
-	createdAt: true,
-	product: {
-		select: {
-			id: true,
-			name: true,
-			sku: true,
-			barcode: true,
-			stock: true,
-			trackStock: true,
-			isActive: true,
-		},
-	},
-	user: {
-		select: {
-			id: true,
-			name: true,
-			email: true,
-			role: true,
-		},
-	},
-} satisfies Prisma.MovementSelect
+export interface MovementQuery extends PaginationQuery {
+	userId?: string
+	productId?: string
+	search?: string
+	movementType?: MovementType
+	from?: Date
+	to?: Date
+}
 
-export type TMovement = Prisma.MovementGetPayload<{
-	select: typeof movementSelect
-}>
+export interface TZodMovement {
+	productId: z.ZodUUID
+	quantity: z.ZodNumber
+}
 
-export interface TCreateMovement {
+export interface TMovement {
 	productId: string
-	quantity: number
-	cost?: number
-	reason?: string
-}
-
-export interface TCreateMovementResult {
-	movement: TMovement
-	product: TProductDetail
-}
-
-export type TAdjustStockParams = {
-	productId: string
-	quantity: number
-	reason: string
-	userId: string
-	cost?: number
-}
-
-export type TResolvedMovement = {
-	type: MovementType
 	quantity: number
 }

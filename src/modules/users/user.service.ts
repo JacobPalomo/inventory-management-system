@@ -1,13 +1,14 @@
 import { Prisma } from '@prisma/client'
-import { AppError } from '../../shared/utils/AppError'
-import { comparePassword, hashPassword } from '../../shared/utils/hash'
-import { PaginationResponse } from '../../shared/types/pagination'
+import { AppError } from '../../utils/AppError'
+import { comparePassword, hashPassword } from '../../utils/hash'
+import { PaginatedResponse } from '../../types/pagination'
 import {
 	SafeUserResponse,
 	TAdminUpdatePassword,
 	TCreateUser,
 	TUpdatePassword,
 	TUpdateUser,
+	UserQuery,
 	UserResponse,
 } from './user.types'
 import {
@@ -19,15 +20,15 @@ import {
 	deleteUserRepo,
 	updatePasswordRepo,
 } from './user.repository'
-import { TUsersQuery } from './user.schema'
 
 export const getUsersService = async (
-	query: TUsersQuery,
-): Promise<PaginationResponse<UserResponse>> => {
-	const { page, limit, search } = query
-
+	query: UserQuery,
+): Promise<PaginatedResponse<UserResponse>> => {
+	const page = parseInt(query.page) || 1
+	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
 
+	const search = query.search || ''
 	const where: Prisma.UserWhereInput = {
 		name: {
 			contains: search,

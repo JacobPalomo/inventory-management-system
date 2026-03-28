@@ -1,4 +1,10 @@
 import z from 'zod'
+import { PaginationQuery } from '../../types/pagination'
+
+export interface ShiftQuery extends PaginationQuery {
+	search?: string
+	isActive?: string
+}
 
 export interface ShiftResponse {
 	id: string

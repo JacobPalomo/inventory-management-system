@@ -1,26 +1,35 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma'
-import { movementSelect, TMovement } from './movement.types'
 
 export const getMovementsRepo = async (params: {
 	skip: number
 	take: number
 	where: Prisma.MovementWhereInput
-}): Promise<{ data: TMovement[]; total: number }> => {
+}) => {
 	const { skip, take, where } = params
 
 	const [data, total] = await Promise.all([
 		prisma.movement.findMany({
 			where,
-			select: movementSelect,
+			include: {
+				product: true,
+				user: true,
+			},
 			skip,
 			take,
 			orderBy: {
 				createdAt: 'desc',
 			},
 		}),
-		prisma.movement.count({ where }),
+		prisma.movement.count(),
 	])
 
 	return { data, total }
+}
+
+export const updateProductStock = (id: string, stock: number) => {
+	return prisma.product.update({
+		where: { id },
+		data: { stock },
+	})
 }

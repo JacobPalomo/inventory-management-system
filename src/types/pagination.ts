@@ -5,12 +5,12 @@ interface MetaPaginatedResponse {
 	totalPages: number
 }
 
-export interface PaginationResponse<T> {
+export interface PaginatedResponse<T> {
 	data: T[]
 	meta: MetaPaginatedResponse
 }
 
 export interface PaginationQuery {
-	page: number
-	limit: number
+	page: string
+	limit: string
 }

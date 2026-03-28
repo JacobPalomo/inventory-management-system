@@ -21,15 +21,14 @@ router.use([authMiddleware, movementRateLimiter])
  *   post:
  *     summary: Registrar entrada de inventario
  *     description: |
- *       Registra una entrada manual de inventario, actualiza el stock del producto
- *       y deja un snapshot del costo usado para el movimiento.
+ *       Requiere autenticación JWT.
  *
  *       Roles permitidos:
  *         - ADMIN
  *         - EDITOR
  *     tags: [Movements]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: [ADMIN, EDITOR]
  *     requestBody:
  *       required: true
  *       content:
@@ -43,22 +42,13 @@ router.use([authMiddleware, movementRateLimiter])
  *               productId:
  *                 type: string
  *                 format: uuid
+ *                 example: d33e6a68-fb52-4260-b245-646e11f1000d
  *               quantity:
- *                 type: integer
- *                 minimum: 1
- *               cost:
  *                 type: number
- *                 minimum: 0
- *                 nullable: true
- *               reason:
- *                 type: string
- *                 maxLength: 255
- *                 nullable: true
+ *                 example: 5
  *           example:
  *             productId: 5967fd31-25d6-457f-b14c-fd8ff59970f2
- *             quantity: 12
- *             cost: 215.5
- *             reason: Recepción de proveedor
+ *             quantity: 5
  *     responses:
  *       201:
  *         description: Movimiento registrado
@@ -68,17 +58,66 @@ router.use([authMiddleware, movementRateLimiter])
  *               type: object
  *               properties:
  *                 movement:
- *                   $ref: '#/components/schemas/Movement'
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     type:
+ *                       type: string
+ *                       format: MovementType
+ *                     quantity:
+ *                       type: number
+ *                     productId:
+ *                       type: string
+ *                       format: uuid
+ *                     userId:
+ *                       type: string
+ *                       format: uuid
+ *                     createdAt:
+ *                       type: string
+ *                       format: ISODateTime
  *                 product:
- *                   $ref: '#/components/schemas/Product'
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     stock:
+ *                       type: number
+ *                     minStock:
+ *                       type: number
+ *                     isActive:
+ *                       type: boolean
+ *                     createdAt:
+ *                       type: string
+ *                       format: ISODateTime
+ *             example:
+ *               movement:
+ *                 id: 3abb28af-622e-4edb-9bc6-5645e41dc190
+ *                 type: IN
+ *                 quantity: 5
+ *                 productId: a712c711-b498-40dc-a9ad-5ac726bb4d64
+ *                 userId: 10b90444-57c1-4d9d-b996-e854bb1f21d6
+ *                 createdAt: 2026-03-21T02:44:36.154Z
+ *               product:
+ *                 id: abe46637-b2ee-4aaf-9d40-d7aa193c22f3
+ *                 name: Laptop HP
+ *                 description: 16GB RAM
+ *                 stock: 15
+ *                 minStock: 3
+ *                 isActive: true
+ *                 createdAt: 2026-03-19T05:00:24.585Z
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
- *       409:
- *         description: Conflicto de inventario
  *       429:
  *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
@@ -92,15 +131,14 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *   post:
  *     summary: Registrar salida de inventario
  *     description: |
- *       Registra una salida manual de inventario y valida reglas de stock,
- *       productos no inventariables y permisos del usuario autenticado.
+ *       Requiere autenticación JWT.
  *
  *       Roles permitidos:
  *         - ADMIN
  *         - EDITOR
  *     tags: [Movements]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: [ADMIN, EDITOR]
  *     requestBody:
  *       required: true
  *       content:
@@ -114,22 +152,13 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *               productId:
  *                 type: string
  *                 format: uuid
+ *                 example: d33e6a68-fb52-4260-b245-646e11f1000d
  *               quantity:
- *                 type: integer
- *                 minimum: 1
- *               cost:
  *                 type: number
- *                 minimum: 0
- *                 nullable: true
- *               reason:
- *                 type: string
- *                 maxLength: 255
- *                 nullable: true
+ *                 example: 5
  *           example:
  *             productId: 964a9123-976b-4cc2-bff4-ca1a2c0752f5
  *             quantity: 2
- *             cost: 145.9
- *             reason: Ajuste por merma
  *     responses:
  *       201:
  *         description: Movimiento registrado
@@ -139,17 +168,66 @@ router.post('/in', authorizeRoles('ADMIN', 'EDITOR'), createEntry)
  *               type: object
  *               properties:
  *                 movement:
- *                   $ref: '#/components/schemas/Movement'
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     type:
+ *                       type: string
+ *                       format: MovementType
+ *                     quantity:
+ *                       type: number
+ *                     productId:
+ *                       type: string
+ *                       format: uuid
+ *                     userId:
+ *                       type: string
+ *                       format: uuid
+ *                     createdAt:
+ *                       type: string
+ *                       format: ISODateTime
  *                 product:
- *                   $ref: '#/components/schemas/Product'
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     name:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     stock:
+ *                       type: number
+ *                     minStock:
+ *                       type: number
+ *                     isActive:
+ *                       type: boolean
+ *                     createdAt:
+ *                       type: string
+ *                       format: ISODateTime
+ *             example:
+ *               movement:
+ *                 id: 3abb28af-622e-4edb-9bc6-5645e41dc190
+ *                 type: OUT
+ *                 quantity: 5
+ *                 productId: a712c711-b498-40dc-a9ad-5ac726bb4d64
+ *                 userId: 10b90444-57c1-4d9d-b996-e854bb1f21d6
+ *                 createdAt: 2026-03-21T02:44:36.154Z
+ *               product:
+ *                 id: abe46637-b2ee-4aaf-9d40-d7aa193c22f3
+ *                 name: Laptop HP
+ *                 description: 16GB RAM
+ *                 stock: 10
+ *                 minStock: 3
+ *                 isActive: true
+ *                 createdAt: 2026-03-19T05:00:24.585Z
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
- *       409:
- *         description: Conflicto de inventario
  *       429:
  *         $ref: '#/components/responses/TooManyRequestsError'
  *       500:
@@ -163,8 +241,7 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *   get:
  *     summary: Obtener historial de movimientos
  *     description: |
- *       Obtiene el historial de movimientos con paginación y filtros por producto,
- *       usuario, tipo, texto libre y rango de fechas.
+ *       Requiere autenticación JWT.
  *     tags: [Movements]
  *     security:
  *       - bearerAuth: []
@@ -172,56 +249,52 @@ router.post('/out', authorizeRoles('ADMIN', 'EDITOR'), createExit)
  *       - in: query
  *         name: page
  *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
+ *           type: number
+ *         example: 1
  *       - in: query
  *         name: limit
  *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 10
- *       - in: query
- *         name: search
- *         description: Busca por nombre, SKU, barcode, razón o usuario
- *         schema:
- *           type: string
- *       - in: query
- *         name: movementType
- *         schema:
- *           $ref: '#/components/schemas/MovementType'
+ *           type: number
+ *         example: 10
  *       - in: query
  *         name: productId
  *         schema:
  *           type: string
- *           format: uuid
+ *         example: "123"
  *       - in: query
- *         name: userId
+ *         name: search
  *         schema:
  *           type: string
- *           format: uuid
+ *         example: laptop
  *       - in: query
- *         name: dateFrom
- *         description: Fecha inicial en formato YYYY-MM-DD
+ *         name: movementType
+ *         schema:
+ *           type: string
+ *           enum: [IN, OUT]
+ *         required: false
+ *         description: Tipo de movimiento (IN = entrada, OUT = salida)
+ *         example: IN
+ *       - in: query
+ *         name: from
  *         schema:
  *           type: string
  *           format: date
+ *         description: Fecha inicial en formato YYYY-MM-DD (zona horaria local)
+ *         example: "2026-03-18"
  *       - in: query
- *         name: dateTo
- *         description: Fecha final en formato YYYY-MM-DD
+ *         name: to
  *         schema:
  *           type: string
  *           format: date
+ *         description: Fecha final en formato YYYY-MM-DD (zona horaria local)
+ *         example: "2026-03-19"
  *     responses:
  *       200:
- *         description: Lista paginada de movimientos
+ *         description: Lista de movimientos
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedMovements'
- *       400:
- *         $ref: '#/components/responses/ValidationError'
+ *                $ref: '#/components/schemas/PaginatedMovements'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       429:

@@ -1,48 +1,72 @@
-import { MovementType, Prisma } from '@prisma/client'
 import { prisma } from '../../config/prisma'
-import { PaginationResponse } from '../../shared/types/pagination'
-import { formatFromDate, formatToDate } from '../../shared/utils/formatDate'
+import { Prisma, MovementType, Movement } from '@prisma/client'
+import { AppError } from '../../utils/AppError'
 import { getMovementsRepo } from './movement.repository'
-import { TMovementQuery } from './movement.schema'
-import { applyMovementInTransaction } from './movement.helpers'
-import { TCreateMovement, TCreateMovementResult, TMovement } from './movement.types'
+import { formatFromDate, formatToDate } from '../../utils/formatDate'
+import { PaginatedResponse } from '../../types/pagination'
+import { MovementQuery } from './movement.types'
 
 export const createMovementService = async (
 	userId: string,
 	type: MovementType,
-	data: TCreateMovement,
-): Promise<TCreateMovementResult> => {
-	return prisma.$transaction(tx =>
-		applyMovementInTransaction({
-			tx,
-			userId,
-			productId: data.productId,
-			type,
-			quantity: data.quantity,
-			reason: data.reason,
-			cost: data.cost,
-		}),
-	)
+	productId: string,
+	quantity: number,
+) => {
+	return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+		const product = await tx.product.findUnique({
+			where: { id: productId },
+		})
+
+		if (!product) {
+			throw new AppError('PRODUCT_NOT_FOUND')
+		}
+
+		let newStock = product.stock
+
+		if (type === 'IN') {
+			newStock += quantity
+		}
+
+		if (type === 'OUT') {
+			if (product.stock < quantity) {
+				throw new AppError('PRODUCT_INSUFFICIENT_STOCK')
+			}
+			newStock -= quantity
+		}
+
+		const updatedProduct = await tx.product.update({
+			where: { id: productId },
+			data: { stock: newStock },
+		})
+
+		const movement = await tx.movement.create({
+			data: {
+				type,
+				quantity,
+				productId,
+				userId,
+			},
+		})
+
+		return {
+			movement,
+			product: updatedProduct,
+		}
+	})
 }
 
 export const getMovementsService = async (
-	query: TMovementQuery,
-): Promise<PaginationResponse<TMovement>> => {
-	const {
-		page,
-		limit,
-		search,
-		movementType,
-		productId,
-		userId,
-		dateFrom,
-		dateTo,
-	} = query
-
+	query: MovementQuery,
+): Promise<PaginatedResponse<Movement>> => {
+	const page = parseInt(query.page) || 1
+	const limit = parseInt(query.limit) || 10
 	const skip = (page - 1) * limit
+
+	const { search, movementType, productId, userId, from, to } = query
 
 	const where: Prisma.MovementWhereInput = {
 		AND: [
+			// filtrar búsqueda (en relaciones)
 			search
 				? {
 						OR: [
@@ -54,47 +78,29 @@ export const getMovementsService = async (
 									},
 								},
 							},
-							{
-								product: {
-									sku: {
-										contains: search,
-										mode: 'insensitive',
-									},
-								},
-							},
-							{
-								product: {
-									barcode: {
-										contains: search,
-										mode: 'insensitive',
-									},
-								},
-							},
-							{
-								user: {
-									name: {
-										contains: search,
-										mode: 'insensitive',
-									},
-								},
-							},
-							{
-								reason: {
-									contains: search,
-									mode: 'insensitive',
-								},
-							},
 						],
 					}
 				: {},
-			movementType ? { type: movementType } : {},
+
+			// filtrar por tipo de movimiento
+			movementType
+				? {
+						type: movementType, // 'IN' | 'OUT'
+					}
+				: {},
+
+			// filtrar por producto
 			productId ? { productId } : {},
+
+			// filtrar por usuario
 			userId ? { userId } : {},
-			dateFrom || dateTo
+
+			// filtrar por rango de fechas
+			from || to
 				? {
 						createdAt: {
-							...(dateFrom ? { gte: formatFromDate(dateFrom) } : {}),
-							...(dateTo ? { lte: formatToDate(dateTo) } : {}),
+							...(from && { gte: formatFromDate(from) }),
+							...(to && { lte: formatToDate(to) }),
 						},
 					}
 				: {},
