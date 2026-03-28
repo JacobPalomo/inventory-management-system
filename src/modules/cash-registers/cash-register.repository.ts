@@ -64,25 +64,27 @@ export const createCashRegisterRepo = async (
 	userId: string,
 	data: TCreateCashRegister,
 ): Promise<TCashRegister> => {
-	const cashRegister = await prisma.cashRegister.create({
-		select,
-		data,
+	return prisma.$transaction(async tx => {
+		const cashRegister = await tx.cashRegister.create({
+			select,
+			data,
+		})
+
+		const { createdAt, ...safeCashRegister } = cashRegister as TCashRegister
+
+		await createAuditLog(tx, {
+			userId,
+			action: AuditAction.CREATE,
+			entity: EntityType.CashRegister,
+			entityId: cashRegister.id,
+			newValue: {
+				...safeCashRegister,
+				createdAt: createdAt.toISOString(),
+			},
+		})
+
+		return cashRegister
 	})
-
-	const { createdAt, ...safeCashRegister } = cashRegister as TCashRegister
-
-	await createAuditLog({
-		userId,
-		action: AuditAction.CREATE,
-		entity: EntityType.CashRegister,
-		entityId: cashRegister.id,
-		newValue: {
-			...safeCashRegister,
-			createdAt: createdAt.toISOString(),
-		},
-	})
-
-	return cashRegister
 }
 
 export const updateCashRegisterRepo = async (
@@ -90,52 +92,56 @@ export const updateCashRegisterRepo = async (
 	userId: string,
 	data: TUpdateCashRegister,
 ): Promise<TCashRegister> => {
-	const updatedCashRegister = await prisma.cashRegister.update({
-		select,
-		where: { id: cashRegister.id },
-		data,
+	return prisma.$transaction(async tx => {
+		const updatedCashRegister = await tx.cashRegister.update({
+			select,
+			where: { id: cashRegister.id },
+			data,
+		})
+
+		const { createdAt, ...safeUpdatedCashRegister } =
+			updatedCashRegister as TCashRegister
+
+		const { oldValue, newValue } = getDiff(cashRegister, safeUpdatedCashRegister)
+
+		await createAuditLog(tx, {
+			userId,
+			action: AuditAction.UPDATE,
+			entity: EntityType.CashRegister,
+			entityId: cashRegister.id,
+			oldValue,
+			newValue,
+		})
+
+		return updatedCashRegister
 	})
-
-	const { createdAt, ...safeUpdatedCashRegister } =
-		updatedCashRegister as TCashRegister
-
-	const { oldValue, newValue } = getDiff(cashRegister, safeUpdatedCashRegister)
-
-	await createAuditLog({
-		userId,
-		action: AuditAction.UPDATE,
-		entity: EntityType.CashRegister,
-		entityId: cashRegister.id,
-		oldValue,
-		newValue,
-	})
-
-	return updatedCashRegister
 }
 
 export const updateCashRegisterStatusRepo = async (
 	userId: string,
 	cashRegister: TCashRegister,
 ): Promise<TCashRegister> => {
-	const updatedCashRegister = await prisma.cashRegister.update({
-		select,
-		where: { id: cashRegister.id },
-		data: { isActive: !cashRegister.isActive },
+	return prisma.$transaction(async tx => {
+		const updatedCashRegister = await tx.cashRegister.update({
+			select,
+			where: { id: cashRegister.id },
+			data: { isActive: !cashRegister.isActive },
+		})
+
+		const { createdAt, ...safeUpdatedCashRegister } =
+			updatedCashRegister as TCashRegister
+
+		const { oldValue, newValue } = getDiff(cashRegister, safeUpdatedCashRegister)
+
+		await createAuditLog(tx, {
+			userId,
+			action: AuditAction.UPDATE,
+			entity: EntityType.CashRegister,
+			entityId: cashRegister.id,
+			oldValue,
+			newValue,
+		})
+
+		return updatedCashRegister
 	})
-
-	const { createdAt, ...safeUpdatedCashRegister } =
-		updatedCashRegister as TCashRegister
-
-	const { oldValue, newValue } = getDiff(cashRegister, safeUpdatedCashRegister)
-
-	await createAuditLog({
-		userId,
-		action: AuditAction.UPDATE,
-		entity: EntityType.CashRegister,
-		entityId: cashRegister.id,
-		oldValue,
-		newValue,
-	})
-
-	return updatedCashRegister
 }

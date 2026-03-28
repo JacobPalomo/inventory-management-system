@@ -212,7 +212,7 @@ export const adjustProductStockService = async (
 	id: string,
 	quantity: number,
 	reason: string,
-	userId?: string,
+	userId: string,
 ) => {
 	const product = await getProductByIdRepo(id)
 

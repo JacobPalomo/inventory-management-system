@@ -298,17 +298,88 @@ export const swaggerSpec = swaggerJsdoc({
 							enum: ['IN', 'OUT'],
 							example: 'OUT',
 						},
+						productId: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
 						quantity: { type: 'integer', example: 5 },
+						cost: {
+							type: 'number',
+							example: 145.9,
+							nullable: true,
+						},
+						reason: {
+							type: 'string',
+							example: 'Ajuste por conteo físico',
+							nullable: true,
+						},
 						createdAt: {
 							type: 'string',
 							format: 'date-time',
 							example: '2026-01-01T00:00:00Z',
 						},
 						product: {
-							$ref: '#/components/schemas/Product',
+							type: 'object',
+							properties: {
+								id: {
+									type: 'string',
+									format: 'uuid',
+									example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+								},
+								name: {
+									type: 'string',
+									example: 'Laptop HP',
+								},
+								sku: {
+									type: 'string',
+									example: 'LAP-HP-001',
+									nullable: true,
+								},
+								barcode: {
+									type: 'string',
+									example: '7501234567890',
+									nullable: true,
+								},
+								stock: {
+									type: 'number',
+									example: 10,
+								},
+								trackStock: {
+									type: 'boolean',
+									example: true,
+								},
+								isActive: {
+									type: 'boolean',
+									example: true,
+								},
+							},
 						},
 						user: {
-							$ref: '#/components/schemas/User',
+							type: 'object',
+							properties: {
+								id: {
+									type: 'string',
+									format: 'uuid',
+									example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+								},
+								name: {
+									type: 'string',
+									example: 'Jacob',
+								},
+								email: {
+									type: 'string',
+									example: 'jacob@test.com',
+								},
+								role: {
+									$ref: '#/components/schemas/Role',
+								},
+							},
 						},
 					},
 				},

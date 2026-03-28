@@ -19,6 +19,7 @@ import {
 	productsQuerySchema,
 	updateProductSchema,
 } from './product.schema'
+import { AuthRequest } from '../../middlewares/auth.middleware'
 
 export const createProduct = async (
 	req: Request,
@@ -102,7 +103,7 @@ export const updateProduct = async (
 }
 
 export const adjustProductStock = async (
-	req: Request,
+	req: AuthRequest,
 	res: Response,
 	next: NextFunction,
 ) => {
@@ -114,6 +115,7 @@ export const adjustProductStock = async (
 			params.id,
 			validated.quantity,
 			validated.reason,
+			req.user.id,
 		)
 
 		res.json(product)
