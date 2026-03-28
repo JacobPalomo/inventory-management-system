@@ -57,6 +57,11 @@ export const ERROR_CODES = {
 		message: 'Stock insuficiente',
 	},
 
+	PRODUCT_DOES_NOT_TRACK_STOCK: {
+		statusCode: 409,
+		message: 'El producto no maneja inventario',
+	},
+
 	// SHIFTS
 	SHIFT_NOT_FOUND: {
 		statusCode: 404,

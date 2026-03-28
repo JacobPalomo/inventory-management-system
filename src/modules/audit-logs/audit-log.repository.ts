@@ -3,9 +3,10 @@ import { prisma } from '../../config/prisma'
 import { Prisma } from '@prisma/client'
 
 export const createAuditLogRepo = async (
+	tx: Prisma.TransactionClient,
 	data: TCreateAuditLog,
 ): Promise<TAuditLog> => {
-	return await prisma.auditLog.create({
+	return await tx.auditLog.create({
 		select: auditLogSelect,
 		data: {
 			...data,
