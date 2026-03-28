@@ -413,6 +413,273 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				SaleStatus: {
+					type: 'string',
+					enum: ['OPEN', 'PAID', 'CANCELLED', 'REFUNDED', 'HOLD', 'QUOTE'],
+					example: 'OPEN',
+				},
+
+				SaleItemStatus: {
+					type: 'string',
+					enum: ['ACTIVE', 'CANCELLED', 'REFUNDED'],
+					example: 'ACTIVE',
+				},
+
+				SaleUserSummary: {
+					type: 'object',
+					required: ['id', 'name'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						name: {
+							type: 'string',
+							example: 'Jacob',
+						},
+					},
+				},
+
+				SaleProductSummary: {
+					type: 'object',
+					required: ['id', 'name'],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						name: {
+							type: 'string',
+							example: 'Laptop HP',
+						},
+						barcode: {
+							type: 'string',
+							example: '7501234567890',
+							nullable: true,
+						},
+						sku: {
+							type: 'string',
+							example: 'LAP-HP-001',
+							nullable: true,
+						},
+					},
+				},
+
+				SaleItem: {
+					type: 'object',
+					required: [
+						'id',
+						'productId',
+						'product',
+						'quantity',
+						'price',
+						'discount',
+						'subtotal',
+						'tax',
+						'total',
+						'status',
+						'isVoided',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '1787d74f-734b-46c2-82dd-5fb8eb8d6ae9',
+						},
+						productId: {
+							type: 'string',
+							format: 'uuid',
+							example: '70278e02-6120-4785-a0bc-fb9b52c2aee9',
+						},
+						product: {
+							$ref: '#/components/schemas/SaleProductSummary',
+						},
+						quantity: {
+							type: 'number',
+							example: 2,
+						},
+						price: {
+							type: 'number',
+							example: 15000,
+						},
+						cost: {
+							type: 'number',
+							example: 12000,
+							nullable: true,
+						},
+						discount: {
+							type: 'number',
+							example: 500,
+						},
+						subtotal: {
+							type: 'number',
+							example: 30000,
+						},
+						tax: {
+							type: 'number',
+							example: 4720,
+						},
+						total: {
+							type: 'number',
+							example: 34220,
+						},
+						status: {
+							$ref: '#/components/schemas/SaleItemStatus',
+						},
+						isVoided: {
+							type: 'boolean',
+							example: false,
+						},
+						voidedAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						voidedById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelledAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						cancelledById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelReason: {
+							type: 'string',
+							nullable: true,
+							example: 'Cancelado por solicitud del cliente',
+						},
+					},
+				},
+
+				Sale: {
+					type: 'object',
+					required: [
+						'id',
+						'userId',
+						'user',
+						'status',
+						'subtotal',
+						'tax',
+						'discount',
+						'total',
+						'isVoided',
+						'createdAt',
+						'updatedAt',
+					],
+					properties: {
+						id: {
+							type: 'string',
+							format: 'uuid',
+							example: '66cba4df-57f0-4b7b-a16b-3be12b72c4e3',
+						},
+						sessionId: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '50fa8bea-75de-45a2-b70b-5f68b8375fd7',
+						},
+						userId: {
+							type: 'string',
+							format: 'uuid',
+							example: '6e8d02df-cb0e-484a-ab73-38a72b69752d',
+						},
+						user: {
+							$ref: '#/components/schemas/SaleUserSummary',
+						},
+						customerId: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+							example: '7f1fb0e1-c406-4021-a0dd-4379069fb32a',
+						},
+						status: {
+							$ref: '#/components/schemas/SaleStatus',
+						},
+						subtotal: {
+							type: 'number',
+							example: 30000,
+						},
+						tax: {
+							type: 'number',
+							example: 4720,
+						},
+						discount: {
+							type: 'number',
+							example: 500,
+						},
+						total: {
+							type: 'number',
+							example: 34220,
+						},
+						notes: {
+							type: 'string',
+							nullable: true,
+							example: 'Venta mostrador',
+						},
+						isVoided: {
+							type: 'boolean',
+							example: false,
+						},
+						voidedAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						voidedById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						voidedBy: {
+							allOf: [
+								{ $ref: '#/components/schemas/SaleUserSummary' },
+							],
+							nullable: true,
+						},
+						createdAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T08:15:00.000Z',
+						},
+						updatedAt: {
+							type: 'string',
+							format: 'date-time',
+							example: '2026-03-27T08:20:00.000Z',
+						},
+						cancelledAt: {
+							type: 'string',
+							format: 'date-time',
+							nullable: true,
+						},
+						cancelledById: {
+							type: 'string',
+							format: 'uuid',
+							nullable: true,
+						},
+						cancelledBy: {
+							allOf: [
+								{ $ref: '#/components/schemas/SaleUserSummary' },
+							],
+							nullable: true,
+						},
+						items: {
+							type: 'array',
+							items: {
+								$ref: '#/components/schemas/SaleItem',
+							},
+						},
+					},
+				},
+
 				MovementType: {
 					type: 'string',
 					enum: ['IN', 'OUT'],
@@ -563,6 +830,23 @@ export const swaggerSpec = swaggerJsdoc({
 									type: 'array',
 									items: {
 										$ref: '#/components/schemas/CashRegister',
+									},
+								},
+							},
+						},
+						{ $ref: '#/components/schemas/PaginatedBase' },
+					],
+				},
+
+				PaginatedSales: {
+					allOf: [
+						{
+							type: 'object',
+							properties: {
+								data: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/Sale',
 									},
 								},
 							},
@@ -766,6 +1050,52 @@ export const swaggerSpec = swaggerJsdoc({
 					},
 				},
 
+				// SALES
+				SaleNotFoundError: {
+					description: 'Venta no encontrada',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_NOT_FOUND',
+								message: 'Venta no encontrada',
+							},
+						},
+					},
+				},
+
+				SaleNotEditableError: {
+					description: 'La venta ya no puede modificarse',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_NOT_EDITABLE',
+								message: 'La venta ya no puede modificarse',
+							},
+						},
+					},
+				},
+
+				SaleInvalidItemDiscountError: {
+					description: 'El descuento del item no puede ser mayor que el subtotal',
+					content: {
+						'application/json': {
+							schema: {
+								$ref: '#/components/schemas/Error',
+							},
+							example: {
+								code: 'SALE_INVALID_ITEM_DISCOUNT',
+								message: 'El descuento del item no puede ser mayor que el subtotal',
+							},
+						},
+					},
+				},
+
 				// SHIFTS
 				ShiftNotFoundError: {
 					description: 'Turno no encontrado',
@@ -957,6 +1287,7 @@ export const swaggerSpec = swaggerJsdoc({
 			{ name: 'Shifts', description: 'Turnos de empleados' },
 			{ name: 'Products', description: 'Gestión de productos' },
 			{ name: 'Movements', description: 'Movimientos de inventario' },
+			{ name: 'Sales', description: 'Gestión de ventas' },
 			{ name: 'AuditLogs', description: 'Registros de auditoría' },
 			{ name: 'CashRegisters', description: 'Cajas registradoras' },
 		],
