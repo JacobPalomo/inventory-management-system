@@ -130,16 +130,26 @@ export const normalizeSaleTotals = (totals: {
 export const calculateSalePaymentAmounts = (
 	total: number,
 	paidAmount: number,
+	refundedAmount = 0,
 ): TSaleComputedAmounts => {
 	const normalizedTotal = roundMoney(total)
 	const normalizedPaidAmount = roundMoney(paidAmount)
+	const normalizedRefundedAmount = roundMoney(refundedAmount)
 	const remainingAmount = roundMoney(
 		Math.max(normalizedTotal - normalizedPaidAmount, 0),
+	)
+	const refundableAmount = roundMoney(
+		Math.max(
+			Math.min(normalizedPaidAmount, normalizedTotal) - normalizedRefundedAmount,
+			0,
+		),
 	)
 
 	return {
 		paidAmount: normalizedPaidAmount,
 		remainingAmount,
+		refundedAmount: normalizedRefundedAmount,
+		refundableAmount,
 	}
 }
 
@@ -150,9 +160,10 @@ export const withSalePaymentAmounts = <
 >(
 	sale: TSaleLike,
 	paidAmount: number,
+	refundedAmount = 0,
 ): TSaleLike & TSaleComputedAmounts => ({
 	...sale,
-	...calculateSalePaymentAmounts(sale.total, paidAmount),
+	...calculateSalePaymentAmounts(sale.total, paidAmount, refundedAmount),
 })
 
 export const isSaleEditable = (sale: {

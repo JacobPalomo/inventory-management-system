@@ -15,6 +15,7 @@ import {
 	findSalesRepo,
 	getProductForSaleRepo,
 	getPaidAmountsBySaleIdsRepo,
+	getRefundedAmountsBySaleIdsRepo,
 	getSaleByIdRepo,
 	getSaleEditableStateRepo,
 	getSaleTotalsRepo,
@@ -46,7 +47,7 @@ export const createSaleService = async (
 
 	const sale = await createSaleRepo(userId, data)
 
-	return withSalePaymentAmounts(sale, 0)
+	return withSalePaymentAmounts(sale, 0, 0)
 }
 
 export const getSalesService = async (
@@ -61,11 +62,17 @@ export const getSalesService = async (
 		where,
 		query,
 	})
-	const paidAmountsBySaleId = await getPaidAmountsBySaleIdsRepo(
-		data.map(sale => sale.id),
-	)
+	const saleIds = data.map(sale => sale.id)
+	const [paidAmountsBySaleId, refundedAmountsBySaleId] = await Promise.all([
+		getPaidAmountsBySaleIdsRepo(saleIds),
+		getRefundedAmountsBySaleIdsRepo(saleIds),
+	])
 	const enrichedData = data.map(sale =>
-		withSalePaymentAmounts(sale, paidAmountsBySaleId.get(sale.id) ?? 0),
+		withSalePaymentAmounts(
+			sale,
+			paidAmountsBySaleId.get(sale.id) ?? 0,
+			refundedAmountsBySaleId.get(sale.id) ?? 0,
+		),
 	)
 
 	return {
@@ -92,8 +99,12 @@ export const getSaleByIdService = async (
 		(total, payment) => total + payment.amount,
 		0,
 	)
+	const refundedAmount = sale.refunds.reduce(
+		(total, refund) => total + refund.amount,
+		0,
+	)
 
-	return withSalePaymentAmounts(sale, paidAmount)
+	return withSalePaymentAmounts(sale, paidAmount, refundedAmount)
 }
 
 export const addItemToSaleService = async (params: {
@@ -160,7 +171,11 @@ export const addItemToSaleService = async (params: {
 			(total, payment) => total + payment.amount,
 			0,
 		)
+		const refundedAmount = updatedSale.refunds.reduce(
+			(total, refund) => total + refund.amount,
+			0,
+		)
 
-		return withSalePaymentAmounts(updatedSale, paidAmount)
+		return withSalePaymentAmounts(updatedSale, paidAmount, refundedAmount)
 	})
 }

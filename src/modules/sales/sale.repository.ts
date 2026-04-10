@@ -96,6 +96,33 @@ export const getPaidAmountsBySaleIdsRepo = async (
 	)
 }
 
+export const getRefundedAmountsBySaleIdsRepo = async (
+	saleIds: string[],
+): Promise<Map<string, number>> => {
+	if (!saleIds.length) {
+		return new Map()
+	}
+
+	const refundsGroupedBySale = await prisma.refund.groupBy({
+		by: ['saleId'],
+		where: {
+			saleId: {
+				in: saleIds,
+			},
+		},
+		_sum: {
+			amount: true,
+		},
+	})
+
+	return new Map(
+		refundsGroupedBySale.map(refund => [
+			refund.saleId,
+			refund._sum.amount ?? 0,
+		]),
+	)
+}
+
 export const getSaleEditableStateRepo = async (
 	tx: Prisma.TransactionClient,
 	id: string,

@@ -4,7 +4,6 @@ import {
 	EntityType,
 	PaymentMethod,
 	Prisma,
-	SaleStatus,
 } from '@prisma/client'
 import { prisma } from '../../config/prisma'
 import { createAuditLog } from '../audit-logs/audit-log.helpers'
@@ -33,10 +32,14 @@ const buildSessionCashPaymentsWhere = (
 		sessionId,
 		isVoided: false,
 		cancelledAt: null,
-		status: {
-			notIn: [SaleStatus.CANCELLED, SaleStatus.REFUNDED],
-		},
 	},
+})
+
+const buildSessionCashRefundsWhere = (
+	sessionId: string,
+): Prisma.RefundWhereInput => ({
+	sessionId,
+	method: PaymentMethod.CASH,
 })
 
 export const findCashSessionByIdRepo = async (
@@ -128,15 +131,25 @@ export const closeCashSessionRepo = async (params: {
 	const { closedById, cashSession, data } = params
 
 	return prisma.$transaction(async tx => {
-		const cashPaymentsTotals = await tx.payment.aggregate({
-			where: buildSessionCashPaymentsWhere(cashSession.id),
-			_sum: {
-				amount: true,
-			},
-		})
+		const [cashPaymentsTotals, cashRefundsTotals] = await Promise.all([
+			tx.payment.aggregate({
+				where: buildSessionCashPaymentsWhere(cashSession.id),
+				_sum: {
+					amount: true,
+				},
+			}),
+			tx.refund.aggregate({
+				where: buildSessionCashRefundsWhere(cashSession.id),
+				_sum: {
+					amount: true,
+				},
+			}),
+		])
 
 		const expectedAmount =
-			cashSession.openingAmount + (cashPaymentsTotals._sum.amount ?? 0)
+			cashSession.openingAmount +
+			(cashPaymentsTotals._sum.amount ?? 0) -
+			(cashRefundsTotals._sum.amount ?? 0)
 
 		const closedCashSession = await tx.cashSession.update({
 			where: { id: cashSession.id },
