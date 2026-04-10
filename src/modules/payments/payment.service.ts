@@ -94,10 +94,14 @@ export const createPaymentService = async (
 			sale.id,
 			nextStatus,
 		)
+		const refundedAmount = updatedSale.refunds.reduce(
+			(total, refund) => total + refund.amount,
+			0,
+		)
 
 		return {
 			payment,
-			sale: withSalePaymentAmounts(updatedSale, totalPaid),
+			sale: withSalePaymentAmounts(updatedSale, totalPaid, refundedAmount),
 		}
 	})
 }

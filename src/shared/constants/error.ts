@@ -142,6 +142,47 @@ export const ERROR_CODES = {
 		message: 'El pago excede el saldo pendiente',
 	},
 
+	// REFUNDS
+	REFUND_NOT_FOUND: {
+		statusCode: 404,
+		message: 'Devolución no encontrada',
+	},
+
+	REFUND_SALE_NOT_REFUNDABLE: {
+		statusCode: 409,
+		message: 'La venta no puede recibir devoluciones',
+	},
+
+	REFUND_CASH_SESSION_REQUIRED: {
+		statusCode: 409,
+		message: 'Se requiere una sesión de caja abierta para devoluciones en efectivo',
+	},
+
+	REFUND_EXCEEDS_REFUNDABLE_BALANCE: {
+		statusCode: 409,
+		message: 'La devolución excede el saldo reembolsable',
+	},
+
+	REFUND_EXCEEDS_METHOD_BALANCE: {
+		statusCode: 409,
+		message: 'La devolución excede el saldo disponible para el método seleccionado',
+	},
+
+	REFUND_ITEM_NOT_FOUND: {
+		statusCode: 404,
+		message: 'Item de venta no encontrado para devolución',
+	},
+
+	REFUND_ITEM_NOT_REFUNDABLE: {
+		statusCode: 409,
+		message: 'El item de venta no puede recibir devoluciones',
+	},
+
+	REFUND_ITEM_EXCEEDS_AVAILABLE_QUANTITY: {
+		statusCode: 409,
+		message: 'La cantidad a devolver excede la cantidad disponible del item',
+	},
+
 	// GENERIC
 	INVALID_QUERY_PARAMS: {
 		statusCode: 400,
