@@ -31,6 +31,14 @@ enum SaleItemStatus {
     REFUNDED
 }
 
+enum PaymentMethod {
+    CASH
+    CARD
+    TRANSFER
+    DIGITAL_WALLET
+    OTHER
+}
+
 model User {
     id       String @id @default(uuid())
     name     String
@@ -55,6 +63,8 @@ model User {
     // Relaciones POS
     cashSessions CashSession[]
     sales        Sale[]
+    refunds      Refund[]
+    payments     Payment[]
 
     // Cancelaciones
     voidedSales        Sale[]        @relation("SaleVoidedBy")
@@ -135,7 +145,8 @@ model CashSession {
     register CashRegister @relation(fields: [registerId], references: [id])
     user     User         @relation(fields: [userId], references: [id])
 
-    sales Sale[]
+    sales   Sale[]
+    refunds Refund[]
 }
 
 //////////////////////////////////////////////////////
@@ -174,7 +185,9 @@ model Sale {
     session CashSession? @relation(fields: [sessionId], references: [id])
     user    User         @relation(fields: [userId], references: [id])
 
-    items SaleItem[]
+    items    SaleItem[]
+    payments Payment[]
+    refunds  Refund[]
 }
 
 model SaleItem {
@@ -209,8 +222,71 @@ model SaleItem {
 
     cancelReason String?
 
-    sale    Sale    @relation(fields: [saleId], references: [id])
-    product Product @relation(fields: [productId], references: [id])
+    sale        Sale         @relation(fields: [saleId], references: [id])
+    product     Product      @relation(fields: [productId], references: [id])
+    refundItems RefundItem[]
+}
+
+//////////////////////////////////////////////////////
+// PAGOS
+//////////////////////////////////////////////////////
+
+model Payment {
+    id String @id @default(uuid())
+
+    saleId String
+    userId String
+
+    method    PaymentMethod
+    amount    Float
+    reference String?
+
+    createdAt DateTime @default(now())
+
+    sale Sale @relation(fields: [saleId], references: [id])
+    user User @relation(fields: [userId], references: [id])
+}
+
+//////////////////////////////////////////////////////
+// DEVOLUCIONES
+//////////////////////////////////////////////////////
+
+model Refund {
+    id String @id @default(uuid())
+
+    saleId String
+    userId String
+    sessionId String?
+
+    method PaymentMethod
+    amount Float
+    reference String?
+    reason String?
+
+    createdAt DateTime @default(now())
+
+    sale    Sale         @relation(fields: [saleId], references: [id])
+    user    User         @relation(fields: [userId], references: [id])
+    session CashSession? @relation(fields: [sessionId], references: [id])
+    items   RefundItem[]
+}
+
+model RefundItem {
+    id String @id @default(uuid())
+
+    refundId String
+    saleItemId String
+
+    quantity Float
+    subtotal Float
+    discount Float
+    tax Float
+    total Float
+
+    createdAt DateTime @default(now())
+
+    refund   Refund   @relation(fields: [refundId], references: [id])
+    saleItem SaleItem @relation(fields: [saleItemId], references: [id])
 }
 
 model Product {

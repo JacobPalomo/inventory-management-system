@@ -2,7 +2,7 @@ import { Prisma, SaleStatus } from '@prisma/client'
 import { AppError } from '../../shared/utils/AppError'
 import { TSalesQuery } from './sale.schema'
 import { formatFromDate, formatToDate } from '../../shared/utils/formatDate'
-import { saleDetailSelect, saleSelect } from './sale.types'
+import { saleDetailSelect, saleSelect, TSaleComputedAmounts } from './sale.types'
 
 export const buildSalesWhere = (query: TSalesQuery): Prisma.SaleWhereInput => {
 	const {
@@ -85,7 +85,7 @@ export const buildSalesWhere = (query: TSalesQuery): Prisma.SaleWhereInput => {
 export const buildSalesSelect = (withItems?: boolean) =>
 	withItems ? saleDetailSelect : saleSelect
 
-const roundMoney = (value: number): number =>
+export const roundMoney = (value: number): number =>
 	Math.round((value + Number.EPSILON) * 100) / 100
 
 export const calculateSaleItemAmounts = (params: {
@@ -125,6 +125,45 @@ export const normalizeSaleTotals = (totals: {
 	discount: roundMoney(totals.discount ?? 0),
 	tax: roundMoney(totals.tax ?? 0),
 	total: roundMoney(totals.total ?? 0),
+})
+
+export const calculateSalePaymentAmounts = (
+	total: number,
+	paidAmount: number,
+	refundedAmount = 0,
+): TSaleComputedAmounts => {
+	const normalizedTotal = roundMoney(total)
+	const normalizedPaidAmount = roundMoney(paidAmount)
+	const normalizedRefundedAmount = roundMoney(refundedAmount)
+	const remainingAmount = roundMoney(
+		Math.max(normalizedTotal - normalizedPaidAmount, 0),
+	)
+	const refundableAmount = roundMoney(
+		Math.max(
+			Math.min(normalizedPaidAmount, normalizedTotal) - normalizedRefundedAmount,
+			0,
+		),
+	)
+
+	return {
+		paidAmount: normalizedPaidAmount,
+		remainingAmount,
+		refundedAmount: normalizedRefundedAmount,
+		refundableAmount,
+	}
+}
+
+export const withSalePaymentAmounts = <
+	TSaleLike extends {
+		total: number
+	},
+>(
+	sale: TSaleLike,
+	paidAmount: number,
+	refundedAmount = 0,
+): TSaleLike & TSaleComputedAmounts => ({
+	...sale,
+	...calculateSalePaymentAmounts(sale.total, paidAmount, refundedAmount),
 })
 
 export const isSaleEditable = (sale: {

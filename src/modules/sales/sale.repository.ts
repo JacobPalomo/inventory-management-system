@@ -6,15 +6,14 @@ import {
 	saleDetailSelect,
 	saleItemSelect,
 	saleSelect,
-	TSale,
-	TSaleDetail,
-	TSaleList,
+	TSaleDetailRaw,
+	TSaleRaw,
 } from './sale.types'
 
 export const createSaleRepo = async (
 	userId: string,
 	data: TCreateSale,
-): Promise<TSale> => {
+): Promise<TSaleRaw> => {
 	const { customerId, sessionId, notes } = data
 
 	return await prisma.sale.create({
@@ -37,7 +36,7 @@ export const findSalesRepo = async (params: {
 	take: number
 	where: Prisma.SaleWhereInput
 	query: TSalesQuery
-}): Promise<{ data: TSaleList[]; total: number }> => {
+}): Promise<{ data: Array<TSaleRaw | TSaleDetailRaw>; total: number }> => {
 	const {
 		skip,
 		take,
@@ -63,11 +62,65 @@ export const findSalesRepo = async (params: {
 
 export const getSaleByIdRepo = async (
 	id: string,
-): Promise<TSaleDetail | null> => {
+): Promise<TSaleDetailRaw | null> => {
 	return prisma.sale.findUnique({
 		where: { id },
 		select: saleDetailSelect,
 	})
+}
+
+export const getPaidAmountsBySaleIdsRepo = async (
+	saleIds: string[],
+): Promise<Map<string, number>> => {
+	if (!saleIds.length) {
+		return new Map()
+	}
+
+	const paymentsGroupedBySale = await prisma.payment.groupBy({
+		by: ['saleId'],
+		where: {
+			saleId: {
+				in: saleIds,
+			},
+		},
+		_sum: {
+			amount: true,
+		},
+	})
+
+	return new Map(
+		paymentsGroupedBySale.map(payment => [
+			payment.saleId,
+			payment._sum.amount ?? 0,
+		]),
+	)
+}
+
+export const getRefundedAmountsBySaleIdsRepo = async (
+	saleIds: string[],
+): Promise<Map<string, number>> => {
+	if (!saleIds.length) {
+		return new Map()
+	}
+
+	const refundsGroupedBySale = await prisma.refund.groupBy({
+		by: ['saleId'],
+		where: {
+			saleId: {
+				in: saleIds,
+			},
+		},
+		_sum: {
+			amount: true,
+		},
+	})
+
+	return new Map(
+		refundsGroupedBySale.map(refund => [
+			refund.saleId,
+			refund._sum.amount ?? 0,
+		]),
+	)
 }
 
 export const getSaleEditableStateRepo = async (
@@ -152,7 +205,7 @@ export const updateSaleTotalsRepo = async (
 		tax: number
 		total: number
 	},
-): Promise<TSaleDetail> => {
+): Promise<TSaleDetailRaw> => {
 	return tx.sale.update({
 		where: { id: saleId },
 		data: totals,

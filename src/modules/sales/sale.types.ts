@@ -1,4 +1,6 @@
 import { Prisma } from '@prisma/client'
+import { paymentEmbeddedSelect } from '../payments/payment.types'
+import { refundEmbeddedSelect } from '../refunds/refund.types'
 
 const safeUserSelect = {
 	id: true,
@@ -73,14 +75,31 @@ export const saleDetailSelect = {
 	items: {
 		select: saleItemSelect,
 	},
+	payments: {
+		select: paymentEmbeddedSelect,
+	},
+	refunds: {
+		select: refundEmbeddedSelect,
+	},
 } satisfies Prisma.SaleSelect
 
-export type TSale = Prisma.SaleGetPayload<{
+export type TSaleRaw = Prisma.SaleGetPayload<{
 	select: typeof saleSelect
 }>
 
-export type TSaleDetail = Prisma.SaleGetPayload<{
+export type TSaleDetailRaw = Prisma.SaleGetPayload<{
 	select: typeof saleDetailSelect
 }>
+
+export type TSaleComputedAmounts = {
+	paidAmount: number
+	remainingAmount: number
+	refundedAmount: number
+	refundableAmount: number
+}
+
+export type TSale = TSaleRaw & TSaleComputedAmounts
+
+export type TSaleDetail = TSaleDetailRaw & TSaleComputedAmounts
 
 export type TSaleList = TSale | TSaleDetail
